@@ -54,6 +54,17 @@ export function fetchUser(address: Address): User {
   return user as User
 }
 
+export function fetchLiquidityPool(address: Address): LiquidityPool {
+  let pool = LiquidityPool.load(address.toHexString())
+  if (pool === null) {
+    pool = new LiquidityPool(address.toHexString())
+    pool.collateralName = ""
+    pool.collateralAddress = ""
+    pool.save()
+  }
+  return pool as LiquidityPool
+}
+
 export function fetchMiningInfo(): MiningInfo {
   let info = MiningInfo.load(MINING_ID)
   if (info === null) {

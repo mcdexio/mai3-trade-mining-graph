@@ -24,6 +24,7 @@ import {
     convertToDecimal,
     AbsBigDecimal,
     fetchMiningInfo,
+    fetchLiquidityPool,
 } from "./utils"
 
 export function handleSetMiningPool(event: SetMiningPoolEvent): void {
@@ -32,6 +33,7 @@ export function handleSetMiningPool(event: SetMiningPoolEvent): void {
     pools.push(event.params.pool.toHexString())
     miningInfo.pools = pools
     miningInfo.save()
+    let pool = fetchLiquidityPool(event.params.pool)
     LiquidityPoolTemplate.create(event.params.pool)
 }
 
