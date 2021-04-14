@@ -1,0 +1,38 @@
+type User @entity {
+    # user address
+    id: ID!
+    totalEarnMCB: BigDecimal!
+    paidMCB: BigDecimal!
+    paidBlock: BigInt
+    unPaidMCB: BigDecimal!
+    tradeAccounts: [TradeAccount!] @derivedFrom(field:"user")
+}
+
+type MiningInfo @entity {
+    # mining protocol address
+    id: ID!
+    rebateRate: BigDecimal!
+    budget: BigDecimal!
+    minedBudget: BigDecimal!
+    pools: [String!]!
+}
+
+type LiquidityPool @entity {
+    # pool address
+    id: ID!
+    collateralName: String!
+    collateralAddress: String!
+    tradeAccounts: [TradeAccount!] @derivedFrom(field:"pool")
+}
+
+type TradeAccount @entity {
+    # pool address + "-" + user address
+    id: ID!
+    user: User!
+    pool: LiquidityPool!
+    tradeVolume: BigDecimal!
+    tradeVolumeUSD: BigDecimal!
+    totalFee: BigDecimal!
+    totalFeeUSD: BigDecimal!
+    earnMCB: BigDecimal!
+}

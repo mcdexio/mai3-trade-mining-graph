@@ -1,0 +1,50 @@
+specVersion: 0.0.2
+description: mai3-trade-mining-graph
+repository: https://github.com/mcdexio/mai3-trade-mining-graph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Mining
+    network: {{network}}
+    source:
+      address: '{{mining_protocol_address}}'
+      abi: Mining
+      startBlock: {{start_block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - MiningInfo
+      abis:
+        - name: Mining
+          file: ./abis/Mining.json
+      eventHandlers:
+        - event: SetMiningPool(indexed address)
+          handler: handleSetMiningPool
+        - event: RebateRateChange(int256,int256)
+          handler: handleRebateRateChange
+        - event: MiningBudgetChange(int256,int256)
+          handler: handleMiningBudgetChange
+        - event: RewardPaid(indexed address,uint256,uint256)
+          handler: handleRewardPaid
+      file: ./src/core.ts
+templates:
+  - kind: ethereum/contract
+    name: 
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+      file: ./src/core.ts
