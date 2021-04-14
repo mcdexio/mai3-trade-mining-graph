@@ -1,7 +1,7 @@
 import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 
 import { LiquidityPool, User, TradeAccount, MiningInfo } from '../generated/schema'
-import { ERC20 as ERC20Contract } from '../generated/Factory/ERC20'
+import { ERC20 as ERC20Contract } from '../generated/Mining/ERC20'
 
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
@@ -9,7 +9,7 @@ export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 
-export let MINING_ADDRESS = ""
+export let MINING_ID = "MCDEX"
 
 export let ReferrerWhiteList:string[] = [
 ]
@@ -55,9 +55,9 @@ export function fetchUser(address: Address): User {
 }
 
 export function fetchMiningInfo(): MiningInfo {
-  let info = MiningInfo.load(MINING_ADDRESS)
+  let info = MiningInfo.load(MINING_ID)
   if (info === null) {
-    info = new MiningInfo(MINING_ADDRESS)
+    info = new MiningInfo(MINING_ID)
     info.rebateRate = ZERO_BD
     info.budget = ZERO_BD
     info.minedBudget = ZERO_BD

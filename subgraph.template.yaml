@@ -20,6 +20,8 @@ dataSources:
       abis:
         - name: Mining
           file: ./abis/Mining.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: SetMiningPool(indexed address)
           handler: handleSetMiningPool
@@ -32,7 +34,10 @@ dataSources:
       file: ./src/core.ts
 templates:
   - kind: ethereum/contract
-    name: 
+    name: LiquidityPool
+    network: {{network}}
+    source:
+      abi: LiquidityPool
     mapping:
       kind: ethereum/event
       apiVersion: 0.0.4

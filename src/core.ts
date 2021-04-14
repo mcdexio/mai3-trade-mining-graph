@@ -1,5 +1,5 @@
 import { BigInt, BigDecimal, ethereum, log, Address } from "@graphprotocol/graph-ts"
-import { LiquidityPool, Perpetual } from "../generated/schema"
+import { LiquidityPool } from "../generated/schema"
 import {
     Trade as TradeEvent,
     TransferFeeToReferrer as TransferFeeToReferrerEvent,
@@ -7,7 +7,7 @@ import {
 
 import {
     SetMiningPool as SetMiningPoolEvent,
-    MiningRateChange as MiningRateChangeEvent,
+    RebateRateChange as RebateRateChangeEvent,
     MiningBudgetChange as MiningBudgetChangeEvent,
     RewardPaid as RewardPaidEvent,
 } from '../generated/Mining/Mining'
@@ -35,13 +35,13 @@ export function handleSetMiningPool(event: SetMiningPoolEvent): void {
     LiquidityPoolTemplate.create(event.params.pool)
 }
 
-export function handleMiningRateChange(event: MiningRateChangeEvent): void {
+export function handleRebateRateChange(event: RebateRateChangeEvent): void {
     let miningInfo = fetchMiningInfo()
-    miningInfo.rebateRate = convertToDecimal(event.params.newMiningRate, BI_18)
+    miningInfo.rebateRate = convertToDecimal(event.params.newRebateRate, BI_18)
     miningInfo.save()
 }
 
-export function handleMiningBudget(event: MiningBudgetChangeEvent): void {
+export function handleMiningBudgetChange(event: MiningBudgetChangeEvent): void {
     let miningInfo = fetchMiningInfo()
     miningInfo.budget = convertToDecimal(event.params.newBudget, BI_18)
     miningInfo.save()
@@ -59,9 +59,8 @@ export function handleTrade(event: TradeEvent): void {
     let id = event.address.toHexString()
         .concat('-')
         .concat(event.params.perpetualIndex.toString())
-    let perp = Perpetual.load(id)
     let trader = fetchUser(event.params.trader)
-    let account = fetchTradeAccount(trader, perp as Perpetual)
+    let account = fetchTradeAccount(trader, liquidityPool as LiquidityPool)
     let price = convertToDecimal(event.params.price, BI_18)
     let position = convertToDecimal(event.params.position, BI_18)
     let fee = convertToDecimal(event.params.fee, BI_18)
@@ -70,7 +69,7 @@ export function handleTrade(event: TradeEvent): void {
 
     // todo token price
     account.tradeVolume += volume
-    account.volumeUSD += volumeUSD
+    account.tradeVolumeUSD += volumeUSD
     account.totalFee += fee
     account.totalFeeUSD += fee
     account.earnMCB += fee
