@@ -58,9 +58,6 @@ export function handleTrade(event: TradeEvent): void {
         return
     }
     let miningInfo = fetchMiningInfo()
-    let id = event.address.toHexString()
-        .concat('-')
-        .concat(event.params.perpetualIndex.toString())
     let trader = fetchUser(event.params.trader)
     let account = fetchTradeAccount(trader, liquidityPool as LiquidityPool)
     let price = convertToDecimal(event.params.price, BI_18)
@@ -70,6 +67,8 @@ export function handleTrade(event: TradeEvent): void {
     let volumeUSD = ZERO_BD
 
     // todo token price
+    trader.totalEarnMCB += fee 
+    trader.save()
     account.tradeVolume += volume
     account.tradeVolumeUSD += volumeUSD
     account.totalFee += fee
