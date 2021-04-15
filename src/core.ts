@@ -41,13 +41,14 @@ export function handleAddMiningPool(event: AddMiningPoolEvent): void {
 export function handleDelMiningPool(event: DelMiningPoolEvent): void {
     let delPool = event.params.pool.toHexString()
     let miningInfo = fetchMiningInfo()
-    let pools = []
-    for (let index = 0; index < miningInfo.pools.length; index++) {
-        if (delPool != miningInfo.pools[index]) {
-            pools.push(miningInfo.pools[index])
+    let pools = miningInfo.pools
+    let newPools:string[] = []
+    for (let index = 0; index < pools.length; index++) {
+        if (delPool != pools[index]) {
+            newPools.push(pools[index])
         }
     }
-    miningInfo.pools = pools
+    miningInfo.pools = newPools
     miningInfo.save()
 }
 
@@ -64,18 +65,31 @@ export function handleMiningBudgetChange(event: MiningBudgetChangeEvent): void {
 }
 
 export function RewardPaid(event: RewardPaidEvent): void {
+    let user = fetchUser(event.params.user)
+    let reward = convertToDecimal(event.params.reward, BI_18)
+    user.paidMCB += reward
+    user.unPaidMCB -= reward
+    user.paidBlock = event.params.paidBlock
+    user.save()
 }
 
 export function handleTrade(event: TradeEvent): void {
+    let miningInfo = fetchMiningInfo()
+    // mining budget reach
+    if (miningInfo.budget <= miningInfo.minedBudget) {
+        return
+    }
     let poolAddr = event.address.toHexString()
     let liquidityPool = LiquidityPool.load(poolAddr)
     if (liquidityPool == null) {
         return
     }
-    let miningInfo = fetchMiningInfo()
+
+    // check pool in mining pool list
     let isExist = false
-    for (let index = 0; index < miningInfo.pools.length; index++) {
-        if (poolAddr == miningInfo.pools[index]) {
+    let pools = miningInfo.pools
+    for (let index = 0; index < pools.length; index++) {
+        if (poolAddr == pools[index]) {
             isExist = true
             break
         }
@@ -83,8 +97,11 @@ export function handleTrade(event: TradeEvent): void {
     if (!isExist) {
         return
     }
-    let trader = fetchUser(event.params.trader)
-    let account = fetchTradeAccount(trader, liquidityPool as LiquidityPool)
+
+    let user = fetchUser(event.params.trader)
+    // user account in each pool
+    let account = fetchTradeAccount(user, liquidityPool as LiquidityPool)
+
     let price = convertToDecimal(event.params.price, BI_18)
     let position = convertToDecimal(event.params.position, BI_18)
     let fee = convertToDecimal(event.params.fee, BI_18)
@@ -92,8 +109,16 @@ export function handleTrade(event: TradeEvent): void {
     let volumeUSD = ZERO_BD
 
     // todo token price
-    trader.totalEarnMCB += fee 
-    trader.save()
+    // update user earned MCB
+    user.totalEarnMCB += fee 
+    user.unPaidMCB += fee
+    user.save()
+
+    // update mined budget
+    miningInfo.minedBudget += fee
+    miningInfo.save()
+
+    // update account trade info 
     account.tradeVolume += volume
     account.tradeVolumeUSD += volumeUSD
     account.totalFee += fee

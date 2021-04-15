@@ -5,16 +5,6 @@
         "internalType": "address",
         "name": "mcb",
         "type": "address"
-      },
-      {
-        "internalType": "int256",
-        "name": "budget",
-        "type": "int256"
-      },
-      {
-        "internalType": "int256",
-        "name": "rebateRate",
-        "type": "int256"
       }
     ],
     "stateMutability": "nonpayable",
