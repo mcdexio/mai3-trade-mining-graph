@@ -23,8 +23,10 @@ dataSources:
         - name: ERC20
           file: ./abis/ERC20.json
       eventHandlers:
-        - event: SetMiningPool(indexed address)
-          handler: handleSetMiningPool
+        - event: AddMiningPool(indexed address)
+          handler: handleAddMiningPool
+        - event: DelMiningPool(indexed address)
+          handler: handleDelMiningPool
         - event: RebateRateChange(int256,int256)
           handler: handleRebateRateChange
         - event: MiningBudgetChange(int256,int256)

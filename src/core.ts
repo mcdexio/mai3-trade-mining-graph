@@ -6,7 +6,8 @@ import {
 } from '../generated/templates/LiquidityPool/LiquidityPool'
 
 import {
-    SetMiningPool as SetMiningPoolEvent,
+    AddMiningPool as AddMiningPoolEvent,
+    DelMiningPool as DelMiningPoolEvent,
     RebateRateChange as RebateRateChangeEvent,
     MiningBudgetChange as MiningBudgetChangeEvent,
     RewardPaid as RewardPaidEvent,
@@ -27,7 +28,7 @@ import {
     fetchLiquidityPool,
 } from "./utils"
 
-export function handleSetMiningPool(event: SetMiningPoolEvent): void {
+export function handleAddMiningPool(event: AddMiningPoolEvent): void {
     let miningInfo = fetchMiningInfo()
     let pools = miningInfo.pools
     pools.push(event.params.pool.toHexString())
@@ -35,6 +36,19 @@ export function handleSetMiningPool(event: SetMiningPoolEvent): void {
     miningInfo.save()
     let pool = fetchLiquidityPool(event.params.pool)
     LiquidityPoolTemplate.create(event.params.pool)
+}
+
+export function handleDelMiningPool(event: DelMiningPoolEvent): void {
+    let delPool = event.params.pool.toHexString()
+    let miningInfo = fetchMiningInfo()
+    let pools = []
+    for (let index = 0; index < miningInfo.pools.length; index++) {
+        if (delPool != miningInfo.pools[index]) {
+            pools.push(miningInfo.pools[index])
+        }
+    }
+    miningInfo.pools = pools
+    miningInfo.save()
 }
 
 export function handleRebateRateChange(event: RebateRateChangeEvent): void {
@@ -53,11 +67,22 @@ export function RewardPaid(event: RewardPaidEvent): void {
 }
 
 export function handleTrade(event: TradeEvent): void {
-    let liquidityPool = LiquidityPool.load(event.address.toHexString())
+    let poolAddr = event.address.toHexString()
+    let liquidityPool = LiquidityPool.load(poolAddr)
     if (liquidityPool == null) {
         return
     }
     let miningInfo = fetchMiningInfo()
+    let isExist = false
+    for (let index = 0; index < miningInfo.pools.length; index++) {
+        if (poolAddr == miningInfo.pools[index]) {
+            isExist = true
+            break
+        }
+    }
+    if (!isExist) {
+        return
+    }
     let trader = fetchUser(event.params.trader)
     let account = fetchTradeAccount(trader, liquidityPool as LiquidityPool)
     let price = convertToDecimal(event.params.price, BI_18)
