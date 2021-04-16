@@ -1,6 +1,7 @@
 type User @entity {
     # user address
     id: ID!
+    totalFee: BigDecimal!
     totalEarnMCB: BigDecimal!
     paidMCB: BigDecimal!
     paidBlock: BigInt

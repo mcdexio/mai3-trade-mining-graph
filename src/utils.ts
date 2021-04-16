@@ -51,6 +51,7 @@ export function fetchUser(address: Address): User {
   if (user === null) {
     user = new User(address.toHexString())
     user.totalEarnMCB = ZERO_BD
+    user.totalFee = ZERO_BD
     user.paidMCB = ZERO_BD
     user.paidBlock = ZERO_BI
     user.unPaidMCB = ZERO_BD

@@ -112,13 +112,14 @@ export function handleTrade(event: TradeEvent): void {
 
     // todo token price
     let tokenPrice = ONE_BD
-    let mcbPrice = ONE_BD
+    let mcbPrice = BigDecimal.fromString('33')
     let feeUSD = fee.times(tokenPrice)
     let volumeUSD = volume.times(tokenPrice)
     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
 
 
     // update user earned MCB
+    user.totalFee += feeUSD
     user.totalEarnMCB += rebateValue
     user.unPaidMCB += rebateValue
     user.save()
@@ -173,11 +174,12 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     let fee = convertToDecimal(event.params.fee, BI_18)
     // todo token price
     let tokenPrice = ONE_BD
-    let mcbPrice = ONE_BD
+    let mcbPrice = BigDecimal.fromString('33')
     let feeUSD = fee.times(tokenPrice)
     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
 
     // update user earned MCB
+    user.totalFee -= feeUSD
     user.totalEarnMCB -= rebateValue
     user.unPaidMCB -= rebateValue
     user.save()
