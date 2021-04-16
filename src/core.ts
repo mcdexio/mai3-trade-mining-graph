@@ -171,7 +171,7 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     let account = fetchTradeAccount(user, liquidityPool as LiquidityPool)
 
     // decrease rebate fee to referrer
-    let fee = convertToDecimal(event.params.fee, BI_18)
+    let fee = convertToDecimal(event.params.referralRebate, BI_18)
     // todo token price
     let tokenPrice = ONE_BD
     let mcbPrice = BigDecimal.fromString('33')
