@@ -19,6 +19,7 @@ import {
 
 import {
     BI_18,
+    ADDRESS_ZERO,
     ZERO_BD,
     fetchUser,
     fetchTradeAccount,
@@ -26,6 +27,8 @@ import {
     AbsBigDecimal,
     fetchMiningInfo,
     fetchLiquidityPool,
+    isReferrerInWhiteList,
+    ONE_BD,
 } from "./utils"
 
 export function handleAddMiningPool(event: AddMiningPoolEvent): void {
@@ -106,27 +109,86 @@ export function handleTrade(event: TradeEvent): void {
     let position = convertToDecimal(event.params.position, BI_18)
     let fee = convertToDecimal(event.params.fee, BI_18)
     let volume = AbsBigDecimal(position).times(price)
-    let volumeUSD = ZERO_BD
 
     // todo token price
+    let tokenPrice = ONE_BD
+    let mcbPrice = ONE_BD
+    let feeUSD = fee.times(tokenPrice)
+    let volumeUSD = volume.times(tokenPrice)
+    let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
+
+
     // update user earned MCB
-    user.totalEarnMCB += fee 
-    user.unPaidMCB += fee
+    user.totalEarnMCB += rebateValue
+    user.unPaidMCB += rebateValue
     user.save()
 
     // update mined budget
-    miningInfo.minedBudget += fee
+    miningInfo.minedBudget += rebateValue
     miningInfo.save()
 
     // update account trade info 
     account.tradeVolume += volume
     account.tradeVolumeUSD += volumeUSD
     account.totalFee += fee
-    account.totalFeeUSD += fee
-    account.earnMCB += fee
+    account.totalFeeUSD += feeUSD
+    account.earnMCB += rebateValue
     account.save()
 }
 
 export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): void {
+    let referrer = event.params.referrer.toHexString()
+    if (referrer == ADDRESS_ZERO || isReferrerInWhiteList(event.params.referrer.toHexString())) {
+        return
+    }
+    let miningInfo = fetchMiningInfo()
+    // mining budget reach
+    if (miningInfo.budget <= miningInfo.minedBudget) {
+        return
+    }
+    let poolAddr = event.address.toHexString()
+    let liquidityPool = LiquidityPool.load(poolAddr)
+    if (liquidityPool == null) {
+        return
+    }
 
+    // check pool in mining pool list
+    let isExist = false
+    let pools = miningInfo.pools
+    for (let index = 0; index < pools.length; index++) {
+        if (poolAddr == pools[index]) {
+            isExist = true
+            break
+        }
+    }
+    if (!isExist) {
+        return
+    }
+
+    let user = fetchUser(event.params.trader)
+    // user account in each pool
+    let account = fetchTradeAccount(user, liquidityPool as LiquidityPool)
+
+    // decrease rebate fee to referrer
+    let fee = convertToDecimal(event.params.fee, BI_18)
+    // todo token price
+    let tokenPrice = ONE_BD
+    let mcbPrice = ONE_BD
+    let feeUSD = fee.times(tokenPrice)
+    let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
+
+    // update user earned MCB
+    user.totalEarnMCB -= rebateValue
+    user.unPaidMCB -= rebateValue
+    user.save()
+
+    // update mined budget
+    miningInfo.minedBudget -= rebateValue
+    miningInfo.save()
+
+    // update account trade info 
+    account.totalFee -= fee
+    account.totalFeeUSD -= feeUSD
+    account.earnMCB -= rebateValue
+    account.save()
 }

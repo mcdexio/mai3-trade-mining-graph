@@ -3,6 +3,7 @@ import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 import { LiquidityPool, User, TradeAccount, MiningInfo } from '../generated/schema'
 import { ERC20 as ERC20Contract } from '../generated/Mining/ERC20'
 
+export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
 export let ZERO_BD = BigDecimal.fromString('0')
