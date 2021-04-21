@@ -20,7 +20,7 @@ import {
 import {
     BI_18,
     ADDRESS_ZERO,
-    ZERO_BD,
+    MCB_ADDRESS,
     fetchUser,
     fetchTradeAccount,
     convertToDecimal,
@@ -28,7 +28,7 @@ import {
     fetchMiningInfo,
     fetchLiquidityPool,
     isReferrerInWhiteList,
-    ONE_BD,
+    getTokenPrice,
 } from "./utils"
 
 export function handleAddMiningPool(event: AddMiningPoolEvent): void {
@@ -38,6 +38,8 @@ export function handleAddMiningPool(event: AddMiningPoolEvent): void {
     miningInfo.pools = pools
     miningInfo.save()
     let pool = fetchLiquidityPool(event.params.pool)
+    pool.collateralAddress = event.params.collateral.toHexString()
+    pool.save()
     LiquidityPoolTemplate.create(event.params.pool)
 }
 
@@ -110,9 +112,11 @@ export function handleTrade(event: TradeEvent): void {
     let fee = convertToDecimal(event.params.fee, BI_18)
     let volume = AbsBigDecimal(position).times(price)
 
-    // todo token price
-    let tokenPrice = ONE_BD
-    let mcbPrice = BigDecimal.fromString('33')
+    let tokenPrice = getTokenPrice(liquidityPool.collateralAddress)
+
+    // let mcbPrice = getTokenPrice(MCB_ADDRESS)
+    let mcbPrice = BigDecimal.fromString('30')
+
     let feeUSD = fee.times(tokenPrice)
     let volumeUSD = volume.times(tokenPrice)
     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
@@ -172,9 +176,11 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
 
     // decrease rebate fee to referrer
     let fee = convertToDecimal(event.params.referralRebate, BI_18)
-    // todo token price
-    let tokenPrice = ONE_BD
-    let mcbPrice = BigDecimal.fromString('33')
+
+    let tokenPrice = getTokenPrice(liquidityPool.collateralAddress)
+    // let mcbPrice = getTokenPrice(MCB_ADDRESS)
+    let mcbPrice = BigDecimal.fromString('30')
+
     let feeUSD = fee.times(tokenPrice)
     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
 

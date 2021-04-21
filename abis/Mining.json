@@ -18,6 +18,12 @@
         "internalType": "address",
         "name": "pool",
         "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "collateral",
+        "type": "address"
       }
     ],
     "name": "AddMiningPool",
@@ -123,6 +129,11 @@
       {
         "internalType": "address",
         "name": "pool",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "collateral",
         "type": "address"
       }
     ],

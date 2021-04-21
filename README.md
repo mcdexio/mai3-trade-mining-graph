@@ -6,7 +6,8 @@
 
 ```
 yarn install
-yarn create-local
+modify utils.ts
+modify config/mainnet.json
 yarn prepare:mainnet
 yarn codegen
 yarn deploy-local

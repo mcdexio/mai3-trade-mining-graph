@@ -22,8 +22,10 @@ dataSources:
           file: ./abis/Mining.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
-        - event: AddMiningPool(indexed address)
+        - event: AddMiningPool(indexed address,indexed address)
           handler: handleAddMiningPool
         - event: DelMiningPool(indexed address)
           handler: handleDelMiningPool
