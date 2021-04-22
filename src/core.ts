@@ -121,6 +121,14 @@ export function handleTrade(event: TradeEvent): void {
     let volumeUSD = volume.times(tokenPrice)
     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
 
+    
+    // update mined budget
+    let minedBudget = miningInfo.minedBudget + rebateValue
+    if (minedBudget > miningInfo.budget) {
+        rebateValue -= (minedBudget - miningInfo.budget)
+    }
+    miningInfo.minedBudget += rebateValue
+    miningInfo.save()
 
     // update user earned MCB
     user.totalFee += feeUSD
@@ -128,9 +136,6 @@ export function handleTrade(event: TradeEvent): void {
     user.unPaidMCB += rebateValue
     user.save()
 
-    // update mined budget
-    miningInfo.minedBudget += rebateValue
-    miningInfo.save()
 
     // update account trade info 
     account.tradeVolume += volume
