@@ -141,14 +141,14 @@ export function getTokenPrice(token: string): BigDecimal {
   if (isUSDToken(token)) {
     return ONE_BD
   }
-  let oracle = ORACLE_MAP.get(token)
-  if (oracle == null) {
+  if (!ORACLE_MAP.isSet(token)) {
     return ZERO_BD
   }
-  let contract = OracleContract.bind(oracle)
+  let oracle = ORACLE_MAP.get(token)
+  let contract = OracleContract.bind(Address.fromString(oracle))
   let callResult = contract.try_priceTWAPShort()
   if(callResult.reverted){
-      log.warning("try_priceTWAPShort reverted. token: {} oracle: {}", [token, oracle])
+      log.warning("try_priceTWAPShort reverted. token: {} oracle: {}", [token, oracle as string])
       return ZERO_BD
   }
 
