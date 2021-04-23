@@ -69,7 +69,7 @@ export function handleMiningBudgetChange(event: MiningBudgetChangeEvent): void {
     miningInfo.save()
 }
 
-export function RewardPaid(event: RewardPaidEvent): void {
+export function handleRewardPaid(event: RewardPaidEvent): void {
     let user = fetchUser(event.params.user)
     let reward = convertToDecimal(event.params.reward, BI_18)
     user.paidMCB += reward
