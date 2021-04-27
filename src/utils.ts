@@ -5,7 +5,7 @@ import { ERC20 as ERC20Contract } from '../generated/Mining/ERC20'
 import {
   USDTokens,
   ReferrerWhiteList
-} './const'
+} from './const'
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -126,7 +126,7 @@ export function getTokenPrice(token: string): BigDecimal {
   if (isUSDToken(token)) {
     return ONE_BD
   }
-  
+
   let priceBucket = PriceBucket.load(token)
   if (priceBucket == null) {
     return ZERO_BD

@@ -208,7 +208,7 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     account.save()
 }
 
-export function handleTokenPrice(block: ethereum.block): void {
+export function handleTokenPrice(block: ethereum.Block): void {
     let timestamp = block.timestamp.toI32()
     // update token price every 10 min
     let index = timestamp / 600
