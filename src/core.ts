@@ -1,9 +1,11 @@
 import { BigInt, BigDecimal, ethereum, log, Address } from "@graphprotocol/graph-ts"
-import { LiquidityPool } from "../generated/schema"
+import { LiquidityPool, PriceBucket } from "../generated/schema"
 import {
     Trade as TradeEvent,
     TransferFeeToReferrer as TransferFeeToReferrerEvent,
 } from '../generated/templates/LiquidityPool/LiquidityPool'
+
+import { Oracle as OracleContract } from '../generated/Mining/Oracle'
 
 import {
     AddMiningPool as AddMiningPoolEvent,
@@ -19,8 +21,9 @@ import {
 
 import {
     BI_18,
+    ZERO_BD,
+    TWO_BD,
     ADDRESS_ZERO,
-    MCB_ADDRESS,
     fetchUser,
     fetchTradeAccount,
     convertToDecimal,
@@ -30,6 +33,7 @@ import {
     isReferrerInWhiteList,
     getTokenPrice,
 } from "./utils"
+import { OracleList, TokenList, MCB_ADDRESS } from "./const"
 
 export function handleAddMiningPool(event: AddMiningPoolEvent): void {
     let miningInfo = fetchMiningInfo()
@@ -114,8 +118,7 @@ export function handleTrade(event: TradeEvent): void {
 
     let tokenPrice = getTokenPrice(liquidityPool.collateralAddress)
 
-    // let mcbPrice = getTokenPrice(MCB_ADDRESS)
-    let mcbPrice = BigDecimal.fromString('30')
+    let mcbPrice = getTokenPrice(MCB_ADDRESS)
 
     let feeUSD = fee.times(tokenPrice)
     let volumeUSD = volume.times(tokenPrice)
@@ -183,8 +186,7 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     let fee = convertToDecimal(event.params.referralRebate, BI_18)
 
     let tokenPrice = getTokenPrice(liquidityPool.collateralAddress)
-    // let mcbPrice = getTokenPrice(MCB_ADDRESS)
-    let mcbPrice = BigDecimal.fromString('30')
+    let mcbPrice = getTokenPrice(MCB_ADDRESS)
 
     let feeUSD = fee.times(tokenPrice)
     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
@@ -204,4 +206,40 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     account.totalFeeUSD -= feeUSD
     account.earnMCB -= rebateValue
     account.save()
+}
+
+export function handleTokenPrice(block: ethereum.block): void {
+    let timestamp = block.timestamp.toI32()
+    // update token price every 10 min
+    let index = timestamp / 600
+    let startUnix = index * 600
+
+    for (let i = 0; i < TokenList.length; i++) {
+        let priceBucket = PriceBucket.load(TokenList[i])
+        if (priceBucket == null) {
+            priceBucket = new PriceBucket(TokenList[i])
+            priceBucket.price = getPriceFromOracle(OracleList[i])
+            priceBucket.timestamp = startUnix
+            priceBucket.save()
+            continue
+        }
+
+        if (priceBucket.timestamp != startUnix) {
+            let price = getPriceFromOracle(OracleList[i])
+            priceBucket.price = priceBucket.price.plus(price).div(TWO_BD)
+            priceBucket.timestamp = startUnix
+            priceBucket.save()
+        }
+    }
+}
+
+function getPriceFromOracle(oracle: string): BigDecimal {
+    let contract = OracleContract.bind(Address.fromString(oracle))
+    let callResult = contract.try_priceTWAPShort()
+    if(callResult.reverted){
+        log.warning("try_priceTWAPShort reverted. oracle: {}", [oracle])
+        return ZERO_BD
+    }
+
+    return convertToDecimal(callResult.value.value0, BI_18)
 }

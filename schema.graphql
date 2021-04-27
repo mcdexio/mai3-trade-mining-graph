@@ -36,3 +36,10 @@ type TradeAccount @entity {
     totalFeeUSD: BigDecimal!
     earnMCB: BigDecimal!
 }
+
+type PriceBucket @entity {
+    # token address
+    id: ID!
+    price: BigDecimal!
+    timestamp: Int!
+}
