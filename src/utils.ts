@@ -143,10 +143,11 @@ export function getTokenPrice(token: string, timestamp: BigInt): BigDecimal {
     priceBucket.timestamp = timestamp
     priceBucket.save()
   }
+  return  price
 }
 
 function getPriceFromOracle(token: string): BigDecimal {
-  let oracle = OracleMap.get(token)
+  let oracle = OracleMap.get(token) as string
   if (oracle == null) {
     return ZERO_BD
   }

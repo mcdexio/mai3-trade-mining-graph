@@ -41,5 +41,5 @@ type PriceBucket @entity {
     # token address
     id: ID!
     price: BigDecimal!
-    timestamp: Int!
+    timestamp: BigInt!
 }

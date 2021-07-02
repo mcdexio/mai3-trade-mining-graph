@@ -35,8 +35,6 @@ dataSources:
           handler: handleMiningBudgetChange
         - event: RewardPaid(indexed address,uint256,uint256)
           handler: handleRewardPaid
-      blockHandlers:
-        - handler: handleTokenPrice
       file: ./src/core.ts
 templates:
   - kind: ethereum/contract
