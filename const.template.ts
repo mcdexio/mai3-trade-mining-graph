@@ -1,17 +1,11 @@
+import { TypedMap } from '@graphprotocol/graph-ts'
+
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
 export let MCB_ADDRESS = "{{mcb_address}}"
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
-// TokenList: tokens need to get price
-export let TokenList:string[] = [
-  "{{mcb_address}}",
-  "{{eth_address}}"
-]
-// OracleList: oracles of each token upper, Notice: index must same with its token
-export let OracleList:string[] = [
-  "{{mcb_oracle}}",
-  "{{eth_oracle}}"
-]
+export let OracleMap = new TypedMap<string, string>();
+OracleMap.set("{{mcb_address}}", "{{mcb_oracle}}")
 
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!

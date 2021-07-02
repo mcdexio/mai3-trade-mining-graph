@@ -2,8 +2,11 @@ import { TypedMap, log, BigInt, BigDecimal, Address } from '@graphprotocol/graph
 
 import { LiquidityPool, User, TradeAccount, MiningInfo, PriceBucket } from '../generated/schema'
 import { ERC20 as ERC20Contract } from '../generated/Mining/ERC20'
+import { Oracle as OracleContract } from '../generated/Mining/Oracle'
+
 import {
   USDTokens,
+  OracleMap,
   ReferrerWhiteList
 } from './const'
 
@@ -13,7 +16,6 @@ export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
 export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
-export let TWO_BD = BigDecimal.fromString('2')
 export let BI_18 = BigInt.fromI32(18)
 
 export let MINING_ID = "MCDEX"
@@ -122,14 +124,38 @@ export function fetchCollateralSymbol(address: Address): string {
   return collateral
 }
 
-export function getTokenPrice(token: string): BigDecimal {
+export function getTokenPrice(token: string, timestamp: BigInt): BigDecimal {
   if (isUSDToken(token)) {
     return ONE_BD
   }
 
-  let priceBucket = PriceBucket.load(token)
-  if (priceBucket == null) {
+  let price = getPriceFromOracle(token)
+  if (price == ZERO_BD) {
+    let priceBucket = PriceBucket.load(token)
+    if (priceBucket == null) {
+      return ZERO_BD
+    } else {
+      return priceBucket.price
+    }
+  } else {
+    let priceBucket = new PriceBucket(token)
+    priceBucket.price = price
+    priceBucket.timestamp = timestamp
+    priceBucket.save()
+  }
+}
+
+function getPriceFromOracle(token: string): BigDecimal {
+  let oracle = OracleMap.get(token)
+  if (oracle == null) {
     return ZERO_BD
   }
-  return priceBucket.price
+  let contract = OracleContract.bind(Address.fromString(oracle))
+  let callResult = contract.try_priceTWAPShort()
+  if(callResult.reverted){
+      log.warning("try_priceTWAPShort reverted. oracle: {}", [oracle])
+      return ZERO_BD
+  }
+
+  return convertToDecimal(callResult.value.value0, BI_18)
 }

@@ -1,19 +1,12 @@
 // generated DO NOT EDIT
+import { TypedMap } from '@graphprotocol/graph-ts'
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
-export let MCB_ADDRESS = "0xa0a45f2b616a740c3c7a7ff69be893f61e6455e3"
+export let MCB_ADDRESS = "0x4e352cf164e64adcbad318c3a1e222e9eba4ce42"
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
-// TokenList: tokens need to get price
-export let TokenList:string[] = [
-  "0xa0a45f2b616a740c3c7a7ff69be893f61e6455e3",
-  "0x025435acd9a326fa25b4098887b38dd2cedf6422"
-]
-// OracleList: oracles of each token upper, Notice: index must same with its token
-export let OracleList:string[] = [
-  "0xa0a45f2b616a740c3c7a7ff69be893f61e6455e3",
-  "0x025435acd9a326fa25b4098887b38dd2cedf6422"
-]
+export let OracleMap = new TypedMap<string, string>();
+OracleMap.set("0x4e352cf164e64adcbad318c3a1e222e9eba4ce42", "0xe9727d80F0A0b8c7372a3e5820b6802FADb1E83B")
 
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
@@ -23,5 +16,5 @@ export let ReferrerWhiteList:string[] = [
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
 // added ["USDC"]
 export let USDTokens:string[] = [
-  "0x8b2c4fa78fba24e4cbb4b0ca7b06a29130317093",
+  "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
 ]
