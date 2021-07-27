@@ -51,6 +51,8 @@ templates:
       abis:
         - name: LiquidityPool
           file: ./abis/LiquidityPool.json
+        - name: Oracle
+          file: ./abis/Oracle.json
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
