@@ -29,6 +29,7 @@ import {
     fetchLiquidityPool,
     isReferrerInWhiteList,
     getTokenPrice,
+    ZERO_BD,
 } from "./utils"
 import { MCB_ADDRESS } from "./const"
 
@@ -82,7 +83,7 @@ export function handleRewardPaid(event: RewardPaidEvent): void {
 export function handleTrade(event: TradeEvent): void {
     let miningInfo = fetchMiningInfo()
     // mining budget reach
-    if (miningInfo.budget <= miningInfo.minedBudget) {
+    if ((miningInfo.budget <= miningInfo.minedBudget) || (miningInfo.rebateRate == ZERO_BD)) {
         return
     }
     let poolAddr = event.address.toHexString()
@@ -153,7 +154,7 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     }
     let miningInfo = fetchMiningInfo()
     // mining budget reach
-    if (miningInfo.budget <= miningInfo.minedBudget) {
+    if ((miningInfo.budget <= miningInfo.minedBudget) || (miningInfo.rebateRate == ZERO_BD)) {
         return
     }
     let poolAddr = event.address.toHexString()
