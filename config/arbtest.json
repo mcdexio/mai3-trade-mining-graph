@@ -1,0 +1,10 @@
+{
+    "network": "arbitrum-rinkeby",
+    "mining_protocol_address": "0x7b2F48AF860391a59845eb2f69CeDe633f24Ab81",
+    "start_block": 2001,
+    "mcb_address": "0x75e14dc5ff61f2ba38800e7e3d08f2fb10503ebb",
+    "eth_address": "0x025435acd9a326fa25b4098887b38dd2cedf6422",
+    "usdc_address": "0x09b98f8b2395d076514037ff7d39a091a536206c",
+    "mcb_oracle": "0x87AbDCb02EDF21B22DEB76d1B6872456A326a3d4",
+    "eth_oracle": "0x84f9b276de73c6766ab714f095c93ef2aee0952e"
+}

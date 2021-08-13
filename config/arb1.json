@@ -1,0 +1,10 @@
+{
+    "network": "arbitrum-one",
+    "mining_protocol_address": "0x005aB6cdf754125B39069eb6bf126030a9113474",
+    "start_block": 52927,
+    "mcb_address": "0x4e352cf164e64adcbad318c3a1e222e9eba4ce42",
+    "eth_address": "0x025435acd9a326fa25b4098887b38dd2cedf6422",
+    "usdc_address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+    "mcb_oracle": "0xe9727d80F0A0b8c7372a3e5820b6802FADb1E83B",
+    "eth_oracle": "0x84f9b276de73c6766ab714f095c93ef2aee0952e"
+}
