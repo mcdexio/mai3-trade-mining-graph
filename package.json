@@ -4,16 +4,19 @@
     "scripts": {
       "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml; mustache config/mainnet.json const.template.ts > src/const.ts",
       "prepare:kovan": "mustache config/kovan.json subgraph.template.yaml > subgraph.yaml; mustache config/kovan.json const.template.ts > src/const.ts",
-      "create": "graph create mcarloai/mai3-trade-mining-graph --node https://api.thegraph.com/deploy/",
+      "prepare:arb1": "mustache config/arb1.json subgraph.template.yaml > subgraph.yaml; mustache config/arb1.json const.template.ts > src/const.ts",
+      "prepare:arbtest": "mustache config/arbtest.json subgraph.template.yaml > subgraph.yaml; mustache config/arb.json const.template.ts > src/const.ts",
+      "create": "graph create mcarloai/mai3-trade-mining --node https://api.thegraph.com/deploy/",
       "create-local": "graph create mcarloai/mai3-trade-mining-graph --node http://10.30.206.10:8020",
       "codegen": "graph codegen",
       "build": "graph build",
-      "deploy": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ mcdexio/mcdex3trademiningkovan",
+      "deploy": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ mcdexio/mai3-trade-mining",
+      "deploy-test": "graph deploy --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/ renpu-mcarlo/mai3-trade-mining",
       "deploy-local": "graph deploy mcarloai/mai3-trade-mining-graph --ipfs http://10.30.206.10:5001 --node http://10.30.206.10:8020"
     },
     "devDependencies": {
-      "@graphprotocol/graph-cli": "^0.18.0",
-      "@graphprotocol/graph-ts": "^0.18.0",
+      "@graphprotocol/graph-cli": "^0.20.1",
+      "@graphprotocol/graph-ts": "^0.20.1",
       "mustache": "^3.1.0"
     }
   }

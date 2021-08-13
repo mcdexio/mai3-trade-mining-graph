@@ -129,21 +129,16 @@ export function getTokenPrice(token: string, timestamp: BigInt): BigDecimal {
     return ONE_BD
   }
 
-  let price = getPriceFromOracle(token)
-  if (price == ZERO_BD) {
-    let priceBucket = PriceBucket.load(token)
-    if (priceBucket == null) {
-      return ZERO_BD
-    } else {
-      return priceBucket.price
-    }
-  } else {
+  let priceBucket = PriceBucket.load(token)
+  if (priceBucket == null || (timestamp - priceBucket.timestamp) >= 86400) {
+    let price = getPriceFromOracle(token)
     let priceBucket = new PriceBucket(token)
     priceBucket.price = price
     priceBucket.timestamp = timestamp
     priceBucket.save()
+    return price
   }
-  return  price
+  return priceBucket.price
 }
 
 function getPriceFromOracle(token: string): BigDecimal {
