@@ -17,3 +17,7 @@ export let ReferrerWhiteList:string[] = [
 export let USDTokens:string[] = [
   "{{usdc_address}}",
 ]
+
+// certified pool address to name
+export let CertifiedPools = new TypedMap<string, string>();
+CertifiedPools.set("{{certified_usdc_pool}}", "{{certified_usdc_pool_name}}")

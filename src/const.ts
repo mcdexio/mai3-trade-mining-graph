@@ -1,4 +1,3 @@
-// generated DO NOT EDIT
 import { TypedMap } from '@graphprotocol/graph-ts'
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
@@ -18,3 +17,7 @@ export let ReferrerWhiteList:string[] = [
 export let USDTokens:string[] = [
   "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
 ]
+
+// certified pool address to name
+export let CertifiedPools = new TypedMap<string, string>();
+CertifiedPools.set("0xab324146c49b23658e5b3930e641bdbdf089cbac", "USDC Pool")
