@@ -18,6 +18,17 @@ type MiningInfo @entity {
     pools: [String!]!
 }
 
+type TradeMiningDayData @entity {
+    # pool + "-" + timeindex
+    id: ID!
+    timestamp: Int!
+    pool: String!
+    poolName: String
+    token: String!
+    minedAmount: BigDecimal!
+    minedValueUSD: BigDecimal!
+}
+
 type LiquidityPool @entity {
     # pool address
     id: ID!

@@ -1,5 +1,5 @@
-import { BigInt, BigDecimal, ethereum, log, Address } from "@graphprotocol/graph-ts"
-import { LiquidityPool, PriceBucket } from "../generated/schema"
+import {BigInt, BigDecimal, ethereum, log, Address} from "@graphprotocol/graph-ts"
+import {LiquidityPool, PriceBucket} from "../generated/schema"
 import {
     Trade as TradeEvent,
     TransferFeeToReferrer as TransferFeeToReferrerEvent,
@@ -14,7 +14,7 @@ import {
     RewardPaid as RewardPaidEvent,
 } from '../generated/Mining/Mining'
 
-import { 
+import {
     LiquidityPool as LiquidityPoolTemplate,
 } from '../generated/templates'
 
@@ -31,7 +31,8 @@ import {
     getTokenPrice,
     ZERO_BD,
 } from "./utils"
-import { MCB_ADDRESS } from "./const"
+import {MCB_ADDRESS} from "./const"
+import {updateTradeMiningDayData} from "./dataUpdate";
 
 export function handleAddMiningPool(event: AddMiningPoolEvent): void {
     let miningInfo = fetchMiningInfo()
@@ -49,7 +50,7 @@ export function handleDelMiningPool(event: DelMiningPoolEvent): void {
     let delPool = event.params.pool.toHexString()
     let miningInfo = fetchMiningInfo()
     let pools = miningInfo.pools
-    let newPools:string[] = []
+    let newPools: string[] = []
     for (let index = 0; index < pools.length; index++) {
         if (delPool != pools[index]) {
             newPools.push(pools[index])
@@ -122,7 +123,7 @@ export function handleTrade(event: TradeEvent): void {
     let volumeUSD = volume.times(tokenPrice)
     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
 
-    
+
     // update mined budget
     let minedBudget = miningInfo.minedBudget + rebateValue
     if (minedBudget > miningInfo.budget) {
@@ -130,6 +131,9 @@ export function handleTrade(event: TradeEvent): void {
     }
     miningInfo.minedBudget += rebateValue
     miningInfo.save()
+
+    // update trade mining day data
+    updateTradeMiningDayData(poolAddr, event.block.timestamp, rebateValue, mcbPrice)
 
     // update user earned MCB
     user.totalFee += feeUSD
@@ -198,6 +202,9 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     // update mined budget
     miningInfo.minedBudget -= rebateValue
     miningInfo.save()
+
+    // update trade mining day data
+    updateTradeMiningDayData(poolAddr, event.block.timestamp, rebateValue.neg(), mcbPrice)
 
     // update account trade info 
     account.totalFee -= fee
