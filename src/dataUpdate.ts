@@ -21,5 +21,6 @@ export function updateTradeMiningDayData(pool: string, timestamp: BigInt, amount
         tradeMiningDayData.minedAmount = tradeMiningDayData.minedAmount.plus(amount)
         tradeMiningDayData.minedValueUSD = tradeMiningDayData.minedValueUSD.plus(amount.times(price))
     }
+    tradeMiningDayData.save()
     return tradeMiningDayData as TradeMiningDayData
 }
