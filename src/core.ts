@@ -151,64 +151,64 @@ export function handleTrade(event: TradeEvent): void {
     account.save()
 }
 
-export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): void {
-    let referrer = event.params.referrer.toHexString()
-    if (referrer == ADDRESS_ZERO || isReferrerInWhiteList(event.params.referrer.toHexString())) {
-        return
-    }
-    let miningInfo = fetchMiningInfo()
-    // mining budget reach
-    if ((miningInfo.budget <= miningInfo.minedBudget) || (miningInfo.rebateRate == ZERO_BD)) {
-        return
-    }
-    let poolAddr = event.address.toHexString()
-    let liquidityPool = LiquidityPool.load(poolAddr)
-    if (liquidityPool == null) {
-        return
-    }
+// export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): void {
+//     let referrer = event.params.referrer.toHexString()
+//     if (referrer == ADDRESS_ZERO || isReferrerInWhiteList(event.params.referrer.toHexString())) {
+//         return
+//     }
+//     let miningInfo = fetchMiningInfo()
+//     // mining budget reach
+//     if ((miningInfo.budget <= miningInfo.minedBudget) || (miningInfo.rebateRate == ZERO_BD)) {
+//         return
+//     }
+//     let poolAddr = event.address.toHexString()
+//     let liquidityPool = LiquidityPool.load(poolAddr)
+//     if (liquidityPool == null) {
+//         return
+//     }
 
-    // check pool in mining pool list
-    let isExist = false
-    let pools = miningInfo.pools
-    for (let index = 0; index < pools.length; index++) {
-        if (poolAddr == pools[index]) {
-            isExist = true
-            break
-        }
-    }
-    if (!isExist) {
-        return
-    }
+//     // check pool in mining pool list
+//     let isExist = false
+//     let pools = miningInfo.pools
+//     for (let index = 0; index < pools.length; index++) {
+//         if (poolAddr == pools[index]) {
+//             isExist = true
+//             break
+//         }
+//     }
+//     if (!isExist) {
+//         return
+//     }
 
-    let user = fetchUser(event.params.trader)
-    // user account in each pool
-    let account = fetchTradeAccount(user, liquidityPool as LiquidityPool)
+//     let user = fetchUser(event.params.trader)
+//     // user account in each pool
+//     let account = fetchTradeAccount(user, liquidityPool as LiquidityPool)
 
-    // decrease rebate fee to referrer
-    let fee = convertToDecimal(event.params.referralRebate, BI_18)
+//     // decrease rebate fee to referrer
+//     let fee = convertToDecimal(event.params.referralRebate, BI_18)
 
-    let tokenPrice = getTokenPrice(liquidityPool.collateralAddress, event.block.timestamp)
-    let mcbPrice = getTokenPrice(MCB_ADDRESS, event.block.timestamp)
+//     let tokenPrice = getTokenPrice(liquidityPool.collateralAddress, event.block.timestamp)
+//     let mcbPrice = getTokenPrice(MCB_ADDRESS, event.block.timestamp)
 
-    let feeUSD = fee.times(tokenPrice)
-    let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
+//     let feeUSD = fee.times(tokenPrice)
+//     let rebateValue = fee.times(miningInfo.rebateRate).times(tokenPrice).div(mcbPrice)
 
-    // update user earned MCB
-    user.totalFee -= feeUSD
-    user.totalEarnMCB -= rebateValue
-    user.unPaidMCB -= rebateValue
-    user.save()
+//     // update user earned MCB
+//     user.totalFee -= feeUSD
+//     user.totalEarnMCB -= rebateValue
+//     user.unPaidMCB -= rebateValue
+//     user.save()
 
-    // update mined budget
-    miningInfo.minedBudget -= rebateValue
-    miningInfo.save()
+//     // update mined budget
+//     miningInfo.minedBudget -= rebateValue
+//     miningInfo.save()
 
-    // update trade mining day data
-    updateTradeMiningDayData(poolAddr, event.block.timestamp, rebateValue.neg(), mcbPrice)
+//     // update trade mining day data
+//     updateTradeMiningDayData(poolAddr, event.block.timestamp, rebateValue.neg(), mcbPrice)
 
-    // update account trade info 
-    account.totalFee -= fee
-    account.totalFeeUSD -= feeUSD
-    account.earnMCB -= rebateValue
-    account.save()
-}
+//     // update account trade info 
+//     account.totalFee -= fee
+//     account.totalFeeUSD -= feeUSD
+//     account.earnMCB -= rebateValue
+//     account.save()
+// }

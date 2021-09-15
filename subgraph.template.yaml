@@ -56,6 +56,6 @@ templates:
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
-        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
-          handler: handleTransferFeeToReferrer
+        # - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+        #   handler: handleTransferFeeToReferrer
       file: ./src/core.ts
