@@ -130,7 +130,7 @@ export function getTokenPrice(token: string, timestamp: BigInt): BigDecimal {
   }
 
   let priceBucket = PriceBucket.load(token)
-  if (priceBucket == null || (timestamp - priceBucket.timestamp) >= BigInt.fromI32(86400)) {
+  if (priceBucket == null || (timestamp - priceBucket.timestamp) >= BigInt.fromI32(3600)) {
     let price = getPriceFromOracle(token)
     let priceBucket = new PriceBucket(token)
     priceBucket.price = price
