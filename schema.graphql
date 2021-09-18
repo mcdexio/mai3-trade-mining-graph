@@ -54,3 +54,10 @@ type PriceBucket @entity {
     price: BigDecimal!
     timestamp: BigInt!
 }
+
+type Swap @entity {
+    id: ID!
+    price0: BigDecimal!
+    price1: BigDecimal!
+    block: BigInt!
+}
