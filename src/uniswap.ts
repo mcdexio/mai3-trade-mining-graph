@@ -51,7 +51,7 @@ export function handleMCBETHSwap(event: SwapEvent): void {
             let acc_t = BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()
             priceBucket.priceAvgHour = acc_pt.div(acc_t)
             priceBucket.hourTimestamp = hourTime
-            priceBucket.timestampLast = timestamp
+            priceBucket.timestampLast = hourTime
             priceBucket.priceLast = mcbToEthPrice
             priceBucket.accPt = ZERO_BD
             priceBucket.accT = ZERO_BD
@@ -91,7 +91,7 @@ export function handleETHUSDCSwap(event: SwapEvent): void {
             let acc_t = BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()
             priceBucket.priceAvgHour = acc_pt.div(acc_t)
             priceBucket.hourTimestamp = hourTime
-            priceBucket.timestampLast = timestamp
+            priceBucket.timestampLast = hourTime
             priceBucket.priceLast = ethToUsdcPrice
             priceBucket.accPt = ZERO_BD
             priceBucket.accT = ZERO_BD
