@@ -1,0 +1,65 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "factory",
+				"type": "address"
+			},
+			{
+				"internalType": "address[]",
+				"name": "path",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint24[]",
+				"name": "fees",
+				"type": "uint24[]"
+			}
+		],
+		"name": "getPrice",
+		"outputs": [
+			{
+				"internalType": "int256",
+				"name": "",
+				"type": "int256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "factory",
+				"type": "address"
+			},
+			{
+				"internalType": "address[]",
+				"name": "path",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint24[]",
+				"name": "fees",
+				"type": "uint24[]"
+			},
+			{
+				"internalType": "uint16",
+				"name": "observationCardinalityNext",
+				"type": "uint16"
+			}
+		],
+		"name": "increaseObservationCardinalityNext",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "totalIncreasedObservationCardinalityNext",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+]
