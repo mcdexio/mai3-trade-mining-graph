@@ -56,12 +56,14 @@ export function handleMCBETHSwap(event: SwapEvent): void {
             priceBucket.accPt = ZERO_BD
             priceBucket.accT = ZERO_BD
         } else {
-            let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()))
-            let acc_t = BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()
-            priceBucket.timestampLast = timestamp
-            priceBucket.priceLast = mcbToEthPrice
-            priceBucket.accPt = acc_pt
-            priceBucket.accT = acc_t
+            if (timestamp > priceBucket.timestampLast) {
+                let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()))
+                let acc_t = BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()
+                priceBucket.timestampLast = timestamp
+                priceBucket.priceLast = mcbToEthPrice
+                priceBucket.accPt = acc_pt
+                priceBucket.accT = acc_t
+            }
         }
     }
     priceBucket.save()
@@ -94,12 +96,14 @@ export function handleETHUSDCSwap(event: SwapEvent): void {
             priceBucket.accPt = ZERO_BD
             priceBucket.accT = ZERO_BD
         } else {
-            let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()))
-            let acc_t = BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()
-            priceBucket.timestampLast = timestamp
-            priceBucket.priceLast = ethToUsdcPrice
-            priceBucket.accPt = acc_pt
-            priceBucket.accT = acc_t
+            if (timestamp > priceBucket.timestampLast) {
+                let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()))
+                let acc_t = BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()
+                priceBucket.timestampLast = timestamp
+                priceBucket.priceLast = ethToUsdcPrice
+                priceBucket.accPt = acc_pt
+                priceBucket.accT = acc_t
+            }
         }
     }
     priceBucket.save()
