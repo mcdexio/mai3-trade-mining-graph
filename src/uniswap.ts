@@ -48,7 +48,7 @@ export function handleMCBETHSwap(event: SwapEvent): void {
     } else {
         if (hourTime > priceBucket.hourTimestamp) {
             let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()))
-            let acc_t = BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()
+            let acc_t = priceBucket.accT.plus(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal())
             priceBucket.priceAvgHour = acc_pt.div(acc_t)
             priceBucket.hourTimestamp = hourTime
             priceBucket.timestampLast = hourTime
@@ -58,7 +58,7 @@ export function handleMCBETHSwap(event: SwapEvent): void {
         } else {
             if (timestamp > priceBucket.timestampLast) {
                 let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()))
-                let acc_t = BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()
+                let acc_t = priceBucket.accT.plus(BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal())
                 priceBucket.timestampLast = timestamp
                 priceBucket.priceLast = mcbToEthPrice
                 priceBucket.accPt = acc_pt
@@ -88,7 +88,7 @@ export function handleETHUSDCSwap(event: SwapEvent): void {
     } else {
         if (hourTime > priceBucket.hourTimestamp) {
             let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()))
-            let acc_t = BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal()
+            let acc_t = priceBucket.accT.plus(BigInt.fromI32(hourTime-priceBucket.timestampLast).toBigDecimal())
             priceBucket.priceAvgHour = acc_pt.div(acc_t)
             priceBucket.hourTimestamp = hourTime
             priceBucket.timestampLast = hourTime
@@ -98,7 +98,7 @@ export function handleETHUSDCSwap(event: SwapEvent): void {
         } else {
             if (timestamp > priceBucket.timestampLast) {
                 let acc_pt = priceBucket.accPt.plus(priceBucket.priceLast.times(BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()))
-                let acc_t = BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal()
+                let acc_t = priceBucket.accT.plus(BigInt.fromI32(timestamp-priceBucket.timestampLast).toBigDecimal())
                 priceBucket.timestampLast = timestamp
                 priceBucket.priceLast = ethToUsdcPrice
                 priceBucket.accPt = acc_pt
