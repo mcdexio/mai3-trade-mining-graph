@@ -59,7 +59,8 @@ type UniswapPriceBucket @entity {
     # uniswap pool id
     id: ID!
     priceAvgHour: BigDecimal!
-    timestamp: Int!
+    hourTimestamp: Int!
+    timestampLast: Int!
     priceLast: BigDecimal!
     accPt: BigDecimal!
     accT: BigDecimal!
