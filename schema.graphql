@@ -55,9 +55,12 @@ type PriceBucket @entity {
     timestamp: BigInt!
 }
 
-type Swap @entity {
+type UniswapPriceBucket @entity {
+    # uniswap pool id
     id: ID!
-    price0: BigDecimal!
-    price1: BigDecimal!
-    block: BigInt!
+    priceAvgHour: BigDecimal!
+    timestamp: Int!
+    priceLast: BigDecimal!
+    accPt: BigDecimal!
+    accT: BigDecimal!
 }

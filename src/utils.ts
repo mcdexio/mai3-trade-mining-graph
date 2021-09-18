@@ -3,7 +3,6 @@ import { TypedMap, log, BigInt, BigDecimal, Address } from '@graphprotocol/graph
 import { LiquidityPool, User, TradeAccount, MiningInfo, PriceBucket } from '../generated/schema'
 import { ERC20 as ERC20Contract } from '../generated/Mining/ERC20'
 import { Oracle as OracleContract } from '../generated/Mining/Oracle'
-import { UniswapTool as UniswapToolContract } from '../generated/Mining/UniswapTool'
 
 
 import {
@@ -21,9 +20,6 @@ export let ONE_BD = BigDecimal.fromString('1')
 export let BI_18 = BigInt.fromI32(18)
 export let BI_6 = BigInt.fromI32(6)
 
-
-const UNISWAP_TOOL_ADDRESS = '0xE2Dd46dD043aaD539d156fEEC2448547c1466A04'
-const UPDATE_BLOCK = BigInt.fromI32(219908)
 
 export let MINING_ID = "MCDEX"
 
@@ -131,14 +127,14 @@ export function fetchCollateralSymbol(address: Address): string {
   return collateral
 }
 
-export function getTokenPrice(token: string, block: BigInt, timestamp: BigInt): BigDecimal {
+export function getTokenPrice(token: string, timestamp: BigInt): BigDecimal {
   if (isUSDToken(token)) {
     return ONE_BD
   }
 
   let priceBucket = PriceBucket.load(token)
   if (priceBucket == null || (timestamp - priceBucket.timestamp) >= BigInt.fromI32(3600)) {
-    let price = getPriceFromOracle(token, block)
+    let price = getPriceFromOracle(token)
     let priceBucket = new PriceBucket(token)
     priceBucket.price = price
     priceBucket.timestamp = timestamp
@@ -148,28 +144,17 @@ export function getTokenPrice(token: string, block: BigInt, timestamp: BigInt): 
   return priceBucket.price
 }
 
-function getPriceFromOracle(token: string, block: BigInt): BigDecimal {
-  if (block < UPDATE_BLOCK) {
-    let oracle = OracleMap.get(token) as string
-    if (oracle == null) {
+function getPriceFromOracle(token: string): BigDecimal {
+  let oracle = OracleMap.get(token) as string
+  if (oracle == null) {
+    return ZERO_BD
+  }
+  let contract = OracleContract.bind(Address.fromString(oracle))
+  let callResult = contract.try_priceTWAPShort()
+  if(callResult.reverted){
+      log.warning("try_priceTWAPShort reverted. oracle: {}", [oracle])
       return ZERO_BD
-    }
-    let contract = OracleContract.bind(Address.fromString(oracle))
-    let callResult = contract.try_priceTWAPShort()
-    if(callResult.reverted){
-        log.warning("try_priceTWAPShort reverted. oracle: {}", [oracle])
-        return ZERO_BD
-    }
-  
-    return convertToDecimal(callResult.value.value0, BI_18)
-  } else {
-    let contract = UniswapToolContract.bind(Address.fromString(UNISWAP_TOOL_ADDRESS))
-    let callResult = contract.try_getPrice('0x1F98431c8aD98523631AE4a59f267346ea31F984', ["0x4e352cF164E64ADCBad318C3a1e222E9EBa4Ce42","0x82aF49447D8a07e3bd95BD0d56f35241523fBab1","0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8"], [3000, 3000])
-    if(callResult.reverted){
-        log.warning("try_getPrice reverted")
-        return ZERO_BD
-    }
-    return convertToDecimal(callResult.value.value0, BI_18)
   }
 
+  return convertToDecimal(callResult.value.value0, BI_18)
 }

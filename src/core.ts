@@ -32,6 +32,7 @@ import {
     ZERO_BD,
 } from "./utils"
 import {MCB_ADDRESS} from "./const"
+import {getMCBPrice} from "./uniswap"
 import {updateTradeMiningDayData} from "./dataUpdate";
 
 export function handleAddMiningPool(event: AddMiningPoolEvent): void {
@@ -115,9 +116,9 @@ export function handleTrade(event: TradeEvent): void {
     let fee = convertToDecimal(event.params.fee, BI_18)
     let volume = AbsBigDecimal(position).times(price)
 
-    let tokenPrice = getTokenPrice(liquidityPool.collateralAddress, event.block.number, event.block.timestamp)
+    let tokenPrice = getTokenPrice(liquidityPool.collateralAddress, event.block.timestamp)
 
-    let mcbPrice = getTokenPrice(MCB_ADDRESS, event.block.number, event.block.timestamp)
+    let mcbPrice = getMCBPrice()
 
     let feeUSD = fee.times(tokenPrice)
     let volumeUSD = volume.times(tokenPrice)

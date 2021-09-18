@@ -24,8 +24,6 @@ dataSources:
           file: ./abis/ERC20.json
         - name: Oracle
           file: ./abis/Oracle.json
-        - name: UniswapTool
-          file: ./abis/UniswapTool.json
       eventHandlers:
         - event: AddMiningPool(indexed address,indexed address)
           handler: handleAddMiningPool
@@ -50,7 +48,7 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Swap
+        - UniswapPriceBucket
       abis:
         - name: UniswapPool
           file: ./abis/UniswapPool.json
@@ -70,7 +68,7 @@ dataSources:
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Swap
+        - UniswapPriceBucket
       abis:
         - name: UniswapPool
           file: ./abis/UniswapPool.json
@@ -95,8 +93,6 @@ templates:
           file: ./abis/LiquidityPool.json
         - name: Oracle
           file: ./abis/Oracle.json
-        - name: UniswapTool
-          file: ./abis/UniswapTool.json
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
