@@ -13,7 +13,7 @@ dataSources:
       startBlock: {{start_block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - MiningInfo
@@ -45,7 +45,7 @@ dataSources:
       startBlock: {{start_block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - UniswapPriceBucket
@@ -65,7 +65,7 @@ dataSources:
       startBlock: {{start_block}}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - UniswapPriceBucket
@@ -84,7 +84,7 @@ templates:
       abi: LiquidityPool
     mapping:
       kind: ethereum/event
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
         - User
@@ -93,9 +93,15 @@ templates:
           file: ./abis/LiquidityPool.json
         - name: Oracle
           file: ./abis/Oracle.json
+        - name: StackPool
+          file: ./abis/MCBStaking.json
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
+        - event: Redeem(indexed address,uint256)
+          handler: handleRedeem
+        - event: Stake(indexed address,uint256,uint256,uint256)
+          handler: handleStake
         # - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
         #   handler: handleTransferFeeToReferrer
       file: ./src/core.ts

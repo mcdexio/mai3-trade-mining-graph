@@ -1,6 +1,7 @@
 type User @entity {
     # user address
     id: ID!
+    stackMCB: BigDecimal!
     totalFee: BigDecimal!
     totalEarnMCB: BigDecimal!
     paidMCB: BigDecimal!

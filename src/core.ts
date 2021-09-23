@@ -152,6 +152,18 @@ export function handleTrade(event: TradeEvent): void {
     account.save()
 }
 
+export function handleRedeem(event: Redeem): void {
+    let user = fetchUser(event.params.account)
+    user.stackMCB -= event.params.redeemed
+    user.save()
+}
+
+export function handleStake(event: Stake): void {
+    let user = fetchUser(event.params.account)
+    user.stackMCB = event.params.totalStaked
+    user.save()
+}
+
 // export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): void {
 //     let referrer = event.params.referrer.toHexString()
 //     if (referrer == ADDRESS_ZERO || isReferrerInWhiteList(event.params.referrer.toHexString())) {
