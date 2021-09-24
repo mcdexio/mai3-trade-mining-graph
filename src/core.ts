@@ -104,8 +104,12 @@ export function handleStake(event: Stake): void {
 }
 
 export function handleUpdatePrice(event: UpdatePrice): void {
-    let markPrice = fetchMarkPrice(event.params.oracle)
-    markPrice.price = event.params.markPrice
+    let id = event.address.toHexString()
+      .connect('-')
+      .connect(event.params.perpetualIndex.toString()
+      .connect(event.params.oracle))
+    let markPrice = MarkPrice.load(id)
+    markPrice.price = convertToDecimal(event.params.markPrice, BI_18)
     markPrice.timestamp = event.params.markPriceUpdateTime
     markPrice.save()
 }
