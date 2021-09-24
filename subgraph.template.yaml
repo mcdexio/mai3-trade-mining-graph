@@ -76,6 +76,28 @@ dataSources:
         - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
           handler: handleETHUSDCSwap
       file: ./src/uniswap.ts
+  - kind: ethereum/contract
+    name: StakePool
+    network: {{network}}
+    source:
+      address: '{{stake_address}}'
+      abi: StackPool
+      startBlook: {{start_block}}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: StackPool
+          file: ./abis/MCBStaking.json
+      eventHandlers:
+        - event: Redeem(indexed address,uint256)
+          handler: handleRedeem
+        - event: Stake(indexed address,uint256,uint256,uint256)
+          handler: handleStake
+      file: ./src/core.ts
 templates:
   - kind: ethereum/contract
     name: LiquidityPool
@@ -93,15 +115,9 @@ templates:
           file: ./abis/LiquidityPool.json
         - name: Oracle
           file: ./abis/Oracle.json
-        - name: StackPool
-          file: ./abis/MCBStaking.json
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
-        - event: Redeem(indexed address,uint256)
-          handler: handleRedeem
-        - event: Stake(indexed address,uint256,uint256,uint256)
-          handler: handleStake
         # - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
         #   handler: handleTransferFeeToReferrer
       file: ./src/core.ts
