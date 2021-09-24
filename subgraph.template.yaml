@@ -5,38 +5,6 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Mining
-    network: {{network}}
-    source:
-      address: '{{mining_protocol_address}}'
-      abi: Mining
-      startBlock: {{start_block}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - MiningInfo
-      abis:
-        - name: Mining
-          file: ./abis/Mining.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-      eventHandlers:
-        - event: AddMiningPool(indexed address,indexed address)
-          handler: handleAddMiningPool
-        - event: DelMiningPool(indexed address)
-          handler: handleDelMiningPool
-        - event: RebateRateChange(int256,int256)
-          handler: handleRebateRateChange
-        - event: MiningBudgetChange(int256,int256)
-          handler: handleMiningBudgetChange
-        - event: RewardPaid(indexed address,uint256,uint256)
-          handler: handleRewardPaid
-      file: ./src/core.ts
-  - kind: ethereum/contract
     name: MCB-ETH
     network: {{network}}
     source:
@@ -118,6 +86,4 @@ templates:
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
-        # - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
-        #   handler: handleTransferFeeToReferrer
       file: ./src/core.ts
