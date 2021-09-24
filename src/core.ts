@@ -18,44 +18,32 @@ import {
 } from "./utils"
 
 export function handleTrade(event: TradeEvent): void {
-    log.warning("trade", [])
     let user = fetchUser(event.params.trader)
-    log.warning("trade 2", [])
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
-    log.warning("trade 3", [])
     // user account in each pool
     let fee = convertToDecimal(event.params.fee, BI_18)
-    log.warning("trade 4", [])
     marginAccount.position += convertToDecimal(event.params.position, BI_18)
-    log.warning("trade 5", [])
     marginAccount.save()
 
     user.totalFee += fee
-    log.warning("trade 6", [])
     user.save()
 }
 
 export function handleRedeem(event: RedeemEvent): void {
-    log.warning("redeem", [])
     let user = fetchUser(event.params.account)
     user.stakedMCB -= convertToDecimal(event.params.redeemed, BI_18)
     user.save()
 }
 
 export function handleStake(event: StakeEvent): void {
-    log.warning("stake", [])
     let user = fetchUser(event.params.account)
     user.stakedMCB = convertToDecimal(event.params.totalStaked, BI_18)
     user.save()
 }
 
 export function handleUpdatePrice(event: UpdatePriceEvent): void {
-    log.warning("update price ", [])
     let markPrice = fetchMarkPrice(event.address, event.params.perpetualIndex)
-    log.warning("update price1 ", [])
     markPrice.price = convertToDecimal(event.params.markPrice, BI_18)
-    log.warning("update price2 ", [])
     markPrice.timestamp = event.params.markPriceUpdateTime.toI32()
-    log.warning("update price3 ", [])
     markPrice.save()
 }
