@@ -50,7 +50,7 @@ dataSources:
     source:
       address: '{{stake_address}}'
       abi: StackPool
-      startBlook: {{start_block}}
+      startBlock: {{start_block}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -66,12 +66,13 @@ dataSources:
         - event: Stake(indexed address,uint256,uint256,uint256)
           handler: handleStake
       file: ./src/core.ts
-templates:
   - kind: ethereum/contract
     name: LiquidityPool
-    network: {{network}}
-    source:
+    network: ArbRinkeby
+    soucre:
+      address: "0xaB324146C49B23658E5b3930E641BDBDf089CbAc"
       abi: LiquidityPool
+      startBlock: 219883
     mapping:
       kind: ethereum/event
       apiVersion: 0.0.5
@@ -81,8 +82,6 @@ templates:
       abis:
         - name: LiquidityPool
           file: ./abis/LiquidityPool.json
-        - name: Oracle
-          file: ./abis/Oracle.json
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
