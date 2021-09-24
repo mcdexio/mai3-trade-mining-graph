@@ -158,3 +158,36 @@ function getPriceFromOracle(token: string): BigDecimal {
 
   return convertToDecimal(callResult.value.value0, BI_18)
 }
+
+export function splitCloseAmount(amount: BigDecimal, delta: BigDecimal): BigDecimal {
+  if (hasSameSign(amount, delta)) {
+    return ZERO_BD
+  } else if (AbsBigDecimal(amount) >= AbsBigDecimal(delta)) {
+    return delta
+  } else {
+    return -amount
+  }
+}
+
+export function hasSameSign(x: BigDecimal, y: BigDecimal): boolean {
+  if (x==ZERO_BD || y==ZERO_BD) {
+    return true
+  }
+  if (x > ZERO_BD && y > ZERO_BD) {
+    return true
+  }
+  if (x < ZERO_BD && y < ZERO_BD) {
+    return true
+  }
+  return false
+}
+
+export function splitOpenAmount(amount: BigDecimal, delta: BigDecimal): BigDecimal {
+  if (hasSameSign(amount, delta)) {
+    return delta
+  } else if (AbsBigDecimal(amount) >= AbsBigDecimal(delta)) {
+    return ZERO_BD
+  } else {
+    return amount+delta
+  }
+}

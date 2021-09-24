@@ -3,10 +3,9 @@ type User @entity {
     id: ID!
     stackMCB: BigDecimal!
     totalFee: BigDecimal!
-    totalEarnMCB: BigDecimal!
     paidMCB: BigDecimal!
     paidBlock: BigInt
-    unPaidMCB: BigDecimal!
+    position: BigDecimal!
     tradeAccounts: [TradeAccount!] @derivedFrom(field:"user")
 }
 
@@ -37,7 +36,6 @@ type TradeAccount @entity {
     tradeVolumeUSD: BigDecimal!
     totalFee: BigDecimal!
     totalFeeUSD: BigDecimal!
-    earnMCB: BigDecimal!
 }
 
 type PriceBucket @entity {
