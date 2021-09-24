@@ -1,13 +1,8 @@
 import {BigInt, BigDecimal, ethereum, log, Address} from "@graphprotocol/graph-ts"
-import {LiquidityPool, PriceBucket} from "../generated/schema"
+import {LiquidityPool, PriceBucket, MarkPrice} from "../generated/schema"
 import {
     Trade as TradeEvent,
-    TransferFeeToReferrer as TransferFeeToReferrerEvent,
 } from '../generated/templates/LiquidityPool/LiquidityPool'
-
-import {
-    LiquidityPool as LiquidityPoolTemplate,
-} from '../generated/templates'
 
 import {
     BI_18,
@@ -20,7 +15,7 @@ import {
     fetchLiquidityPool,
     isReferrerInWhiteList,
     getTokenPrice,
-    ZERO_BD,
+    ZERO_BD, fetchMarkPrice,
 } from "./utils"
 import {MCB_ADDRESS} from "./const"
 import {getMCBPrice} from "./uniswap"
@@ -106,4 +101,11 @@ export function handleStake(event: Stake): void {
     let user = fetchUser(event.params.account)
     user.stackMCB = event.params.totalStaked
     user.save()
+}
+
+export function handleUpdatePrice(event: UpdatePrice): void {
+    let markPrice = fetchMarkPrice(event.params.oracle)
+    markPrice.price = event.params.markPrice
+    markPrice.timestamp = event.params.markPriceUpdateTime
+    markPrice.save()
 }

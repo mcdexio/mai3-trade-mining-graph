@@ -1,6 +1,6 @@
 import { TypedMap, log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 
-import { LiquidityPool, User, TradeAccount, MiningInfo, PriceBucket } from '../generated/schema'
+import { LiquidityPool, User, TradeAccount, MiningInfo, PriceBucket, MarkPrice } from '../generated/schema'
 import { ERC20 as ERC20Contract } from '../generated/Mining/ERC20'
 import { Oracle as OracleContract } from '../generated/Mining/Oracle'
 
@@ -61,6 +61,18 @@ export function AbsBigDecimal(x: BigDecimal): BigDecimal {
     return x
   }
   return -x
+}
+
+export function fetchMarkPrice(address: Address): MarkPrice {
+  let markPrice = MarkPrice.load(address)
+  if (markPrice === null) {
+    markPrice = new MarkPrice(address)
+    markPrice.price = ZERO_BD
+    markPrice.timestamp = ZERO_BD
+    markPrice.oracle = address
+    markPrice.save()
+  }
+  return markPrice as MarkPrice
 }
 
 export function fetchUser(address: Address): User {
