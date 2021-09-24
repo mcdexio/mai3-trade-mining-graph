@@ -46,9 +46,9 @@ dataSources:
       file: ./src/uniswap.ts
   - kind: ethereum/contract
     name: StakePool
-    network: {{network}}
+    network: ArbRinkeby
     source:
-      address: '{{stake_address}}'
+      address: "0xcc3f2c435F87736edA0ca9dc716b2fb65d35B001"
       abi: StackPool
       startBlock: {{start_block}}
     mapping:
@@ -85,4 +85,6 @@ dataSources:
       eventHandlers:
         - event: Trade(uint256,indexed address,int256,int256,int256,int256)
           handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
       file: ./src/core.ts

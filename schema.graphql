@@ -57,3 +57,10 @@ type UniswapPriceBucket @entity {
     accPt: BigDecimal!
     accT: BigDecimal!
 }
+
+type MarkPrice @entity {
+    id: ID!
+    price: BigDecimal!
+    timestamp: Int!
+    oracle: String!
+}
