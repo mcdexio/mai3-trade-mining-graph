@@ -1,88 +1,61 @@
-import {LiquidityPool, MarkPrice} from "../generated/schema"
+import { MarkPrice, User, MarginAccount} from "../generated/schema"
 import {
     Trade as TradeEvent,
     UpdatePrice as UpdatePriceEvent,
-    Redeem as RedeemEvent,
-    Stake as StakeEvent
-} from '../generated/templates/LiquidityPool/LiquidityPool'
+} from '../generated/LiquidityPool/LiquidityPool'
+
+import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 
 import {
-    AbsBigDecimal,
+    Redeem as RedeemEvent,
+    Stake as StakeEvent
+} from '../generated/StakePool/StakePool'
+
+import {
     BI_18,
-    convertToDecimal,
-    fetchTradeAccount,
+    convertToDecimal, fetchMarginAccount, fetchMarkPrice,
     fetchUser,
-    getTokenPrice,
-    splitCloseAmount,
-    splitOpenAmount,
-    ZERO_BD
 } from "./utils"
-import {getMCBPrice} from "./uniswap"
 
 export function handleTrade(event: TradeEvent): void {
-    let poolAddr = event.address.toHexString()
-    let liquidityPool = LiquidityPool.load(poolAddr)
-    if (liquidityPool == null) {
-        return
-    }
+    log.warning("trade", [])
     let user = fetchUser(event.params.trader)
+    log.warning("trade 2", [])
+    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    log.warning("trade 3", [])
     // user account in each pool
-    let account = fetchTradeAccount(user, liquidityPool as LiquidityPool)
-
-    let price = convertToDecimal(event.params.price, BI_18)
-    let position = convertToDecimal(event.params.position, BI_18)
     let fee = convertToDecimal(event.params.fee, BI_18)
-    let volume = AbsBigDecimal(position).times(price)
+    log.warning("trade 4", [])
+    marginAccount.position += convertToDecimal(event.params.position, BI_18)
+    log.warning("trade 5", [])
+    marginAccount.save()
 
-    let tokenPrice = getTokenPrice(liquidityPool.collateralAddress, event.block.timestamp)
-
-    let feeUSD = fee.times(tokenPrice)
-    let volumeUSD = volume.times(tokenPrice)
-
-    // update user earned MCB
-    user.totalFee += feeUSD
-
-    // update account trade info
-    account.tradeVolume += volume
-    account.tradeVolumeUSD += volumeUSD
-    account.totalFee += fee
-    account.totalFeeUSD += feeUSD
-    account.save()
-
-    let close = splitCloseAmount(user.position, position)
-    let open = splitOpenAmount(user.position, position)
-
-    // close position
-    if (close != ZERO_BD) {
-        user.position = user.position.plus(close)
-    }
-
-    // open position
-    if (open != ZERO_BD) {
-        user.position = user.position.plus(open)
-    }
+    user.totalFee += fee
+    log.warning("trade 6", [])
     user.save()
 }
 
 export function handleRedeem(event: RedeemEvent): void {
+    log.warning("redeem", [])
     let user = fetchUser(event.params.account)
-    user.stackMCB -= event.params.redeemed
+    user.stakedMCB -= convertToDecimal(event.params.redeemed, BI_18)
     user.save()
 }
 
 export function handleStake(event: StakeEvent): void {
+    log.warning("stake", [])
     let user = fetchUser(event.params.account)
-    user.stackMCB = event.params.totalStaked
+    user.stakedMCB = convertToDecimal(event.params.totalStaked, BI_18)
     user.save()
 }
 
 export function handleUpdatePrice(event: UpdatePriceEvent): void {
-    let id = event.address.toHexString()
-      .connect('-')
-      .connect(event.params.perpetualIndex.toString()
-      .connect(event.params.oracle))
-    let markPrice = MarkPrice.load(id)
+    log.warning("update price ", [])
+    let markPrice = fetchMarkPrice(event.address, event.params.perpetualIndex)
+    log.warning("update price1 ", [])
     markPrice.price = convertToDecimal(event.params.markPrice, BI_18)
-    markPrice.timestamp = event.params.markPriceUpdateTime
+    log.warning("update price2 ", [])
+    markPrice.timestamp = event.params.markPriceUpdateTime.toI32()
+    log.warning("update price3 ", [])
     markPrice.save()
 }

@@ -1,8 +1,6 @@
 {
     "network": "arbitrum-rinkeby",
-    "mining_protocol_address": "0xD6629d013a2781A9913512F7a1cb08d7c4212761",
-    "start_block": 4512770,
-    "mcb_address": "0x3e5f8cb3ac6114a3b25cdc108acad95fd1d03d29",
-    "usdc_address": "0x09b98f8b2395d076514037ff7d39a091a536206c",
-    "mcb_oracle": "0x87AbDCb02EDF21B22DEB76d1B6872456A326a3d4"
+    "start_block": 808,
+    "liquidity_pool": "0xc32a2dfEe97E2bABc90a2b5e6aef41e789ef2E13",
+    "stake_contract": "0xcc3f2c435F87736edA0ca9dc716b2fb65d35B001"
 }
