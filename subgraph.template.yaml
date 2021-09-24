@@ -5,51 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: MCB-ETH
-    network: {{network}}
-    source:
-      address: '{{mcb_eth_pool_address}}'
-      abi: UniswapPool
-      startBlock: {{start_block}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - UniswapPriceBucket
-      abis:
-        - name: UniswapPool
-          file: ./abis/UniswapPool.json
-      eventHandlers:
-        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
-          handler: handleMCBETHSwap
-      file: ./src/uniswap.ts
-  - kind: ethereum/contract
-    name: ETH-USDC
-    network: {{network}}
-    source:
-      address: '{{eth_usdc_pool_address}}'
-      abi: UniswapPool
-      startBlock: {{start_block}}
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - UniswapPriceBucket
-      abis:
-        - name: UniswapPool
-          file: ./abis/UniswapPool.json
-      eventHandlers:
-        - event: Swap(indexed address,indexed address,int256,int256,uint160,uint128,int24)
-          handler: handleETHUSDCSwap
-      file: ./src/uniswap.ts
-  - kind: ethereum/contract
     name: StakePool
-    network: ArbRinkeby
+    network: {{network}}
     source:
-      address: "0xcc3f2c435F87736edA0ca9dc716b2fb65d35B001"
-      abi: StackPool
+      address: '{{stake_contract}}'
+      abi: StakePool
       startBlock: {{start_block}}
     mapping:
       kind: ethereum/events
@@ -58,7 +18,7 @@ dataSources:
       entities:
         - User
       abis:
-        - name: StackPool
+        - name: StakePool
           file: ./abis/MCBStaking.json
       eventHandlers:
         - event: Redeem(indexed address,uint256)
@@ -68,11 +28,11 @@ dataSources:
       file: ./src/core.ts
   - kind: ethereum/contract
     name: LiquidityPool
-    network: ArbRinkeby
-    soucre:
-      address: "0xaB324146C49B23658E5b3930E641BDBDf089CbAc"
+    network: {{network}}
+    source:
+      address: '{{liquidity_pool}}'
       abi: LiquidityPool
-      startBlock: 219883
+      startBlock: {{start_block}}
     mapping:
       kind: ethereum/event
       apiVersion: 0.0.5
