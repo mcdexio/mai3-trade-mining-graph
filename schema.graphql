@@ -2,6 +2,7 @@ type User @entity {
     # user address
     id: ID!
     stakedMCB: BigDecimal!
+    unlockMCBTime: Int!
     totalFee: BigDecimal!
     marginAccounts: [MarginAccount!] @derivedFrom(field:"user")
 }
