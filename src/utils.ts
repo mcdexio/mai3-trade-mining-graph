@@ -31,6 +31,7 @@ export function fetchUser(address: Address): User {
     user = new User(address.toHexString())
     user.totalFee = ZERO_BD
     user.stakedMCB = ZERO_BD
+    user.unlockMCBTime = 0
     user.save()
   }
   return user as User

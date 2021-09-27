@@ -38,6 +38,7 @@ export function handleRedeem(event: RedeemEvent): void {
 export function handleStake(event: StakeEvent): void {
     let user = fetchUser(event.params.account)
     user.stakedMCB = convertToDecimal(event.params.totalStaked, BI_18)
+    user.unlockMCBTime = event.params.unlockTime.toI32()
     user.save()
 }
 
