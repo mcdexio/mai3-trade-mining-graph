@@ -48,4 +48,6 @@ dataSources:
           handler: handleTrade
         - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
           handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256)
+          handler: handleLiquidate
       file: ./src/core.ts
