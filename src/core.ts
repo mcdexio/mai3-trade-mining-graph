@@ -2,6 +2,7 @@ import { MarkPrice, User, MarginAccount} from "../generated/schema"
 import {
     Trade as TradeEvent,
     UpdatePrice as UpdatePriceEvent,
+    Liquidate as LiquidateEvent,
 } from '../generated/LiquidityPool/LiquidityPool'
 
 import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
@@ -31,6 +32,14 @@ export function handleTrade(event: TradeEvent): void {
 
     user.totalFee += fee
     user.save()
+}
+
+export function handleLiquidate(event: LiquidateEvent): void {
+    let user = fetchUser(event.params.trader)
+    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let position = convertToDecimal(event.params.amount, BI_18)
+    marginAccount.position += position
+    marginAccount.save()
 }
 
 export function handleRedeem(event: RedeemEvent): void {
