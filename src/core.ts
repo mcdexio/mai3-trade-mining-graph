@@ -23,7 +23,7 @@ export function handleTrade(event: TradeEvent): void {
     // user account in each pool
     let fee = convertToDecimal(event.params.fee, BI_18)
     let position = convertToDecimal(event.params.position, BI_18)
-    log.debug("user {} PerpIndex {} position ->", [event.params.trader.toHexString()])
+    log.debug("user {} PerpIndex {} position ->", [event.params.trader.toHexString(), event.params.perpetualIndex.toString()])
     log.debug("{} convert => position: {}", [event.params.position.toString(), position.toString()])
     marginAccount.position += position
 
