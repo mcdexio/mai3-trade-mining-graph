@@ -116,3 +116,9 @@ export function getMCBPrice(): BigDecimal {
     let ethToUsdcPrice = ethToUsdcPriceBucket.priceAvgHour
     return mcbToEthPrice.times(ethToUsdcPrice)
 }
+
+export function getETHPrice(): BigDecimal {
+    let ethToUsdcPriceBucket = UniswapPriceBucket.load("0x17c14d2c404d167802b16c450d3c99f88f2c4f4d")
+    let ethToUsdcPrice = ethToUsdcPriceBucket.priceAvgHour
+    return ethToUsdcPrice
+}

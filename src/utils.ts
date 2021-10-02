@@ -8,8 +8,10 @@ import { Oracle as OracleContract } from '../generated/Mining/Oracle'
 import {
   USDTokens,
   OracleMap,
-  ReferrerWhiteList
+  ReferrerWhiteList,
+  ETH_ADDRESS
 } from './const'
+import { getETHPrice } from './uniswap'
 
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
@@ -130,6 +132,10 @@ export function fetchCollateralSymbol(address: Address): string {
 export function getTokenPrice(token: string, timestamp: BigInt): BigDecimal {
   if (isUSDToken(token)) {
     return ONE_BD
+  }
+
+  if (token == ETH_ADDRESS) {
+    return getETHPrice()
   }
 
   let priceBucket = PriceBucket.load(token)
