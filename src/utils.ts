@@ -29,7 +29,6 @@ export function fetchUser(address: Address): User {
   let user = User.load(address.toHexString())
   if (user === null) {
     user = new User(address.toHexString())
-    user.totalFee = ZERO_BD
     user.stakedMCB = ZERO_BD
     user.unlockMCBTime = 0
     user.save()
@@ -48,6 +47,8 @@ export function fetchMarginAccount(user: User, pool: Address, perpetualIndex: Bi
     marginAccount = new MarginAccount(id)
     marginAccount.user = user.id
     marginAccount.position = ZERO_BD
+    marginAccount.totalFee = ZERO_BD
+    marginAccount.inversePoolTotalFee = ZERO_BD
     marginAccount.save()
   }
   return marginAccount as MarginAccount

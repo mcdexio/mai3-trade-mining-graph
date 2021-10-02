@@ -21,6 +21,7 @@ import {
 export function handleTrade(event: TradeEvent): void {
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let markPrice = fetchMarkPrice(event.address, event.params.perpetualIndex)
     // user account in each pool
     let fee = convertToDecimal(event.params.fee, BI_18)
     let position = convertToDecimal(event.params.position, BI_18)
@@ -28,9 +29,10 @@ export function handleTrade(event: TradeEvent): void {
     log.debug("{} convert => position: {}", [event.params.position.toString(), position.toString()])
     marginAccount.position += position
 
-    marginAccount.save()
+    marginAccount.totalFee += fee
+    marginAccount.inversePoolTotalFee += (fee / markPrice.price)
 
-    user.totalFee += fee
+    marginAccount.save()
     user.save()
 }
 
