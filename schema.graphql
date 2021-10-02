@@ -3,7 +3,6 @@ type User @entity {
     id: ID!
     stakedMCB: BigDecimal!
     unlockMCBTime: Int!
-    totalFee: BigDecimal!
     marginAccounts: [MarginAccount!] @derivedFrom(field:"user")
 }
 
@@ -19,4 +18,6 @@ type MarginAccount @entity {
     id: ID!
     user: User!
     position: BigDecimal!
+    totalFee: BigDecimal!
+    inversePoolTotalFee: BigDecimal!
 }
