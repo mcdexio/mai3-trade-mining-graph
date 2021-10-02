@@ -10,7 +10,7 @@ dataSources:
     source:
       address: '{{stake_contract}}'
       abi: StakePool
-      startBlock: {{start_block}}
+      startBlock: {{stake_start_block}}
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
