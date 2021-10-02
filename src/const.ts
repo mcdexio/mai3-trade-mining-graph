@@ -2,6 +2,7 @@ import { TypedMap } from '@graphprotocol/graph-ts'
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
 export let MCB_ADDRESS = "0x4e352cf164e64adcbad318c3a1e222e9eba4ce42"
+export let ETH_ADDRESS = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
 
 // !!!!!!!!!!!!!!  Notice Lower Case  !!!!!!!!!!!!!!
 export let OracleMap = new TypedMap<string, string>();
