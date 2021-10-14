@@ -81,6 +81,10 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
     let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
     let operatorAddress = event.params.operator.toHexString()
     if (operatorAddress == '0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e') {
+        // bsc: MCDEX dao operator
+        marginAccount.operatorFee += operatorFee
+    } else if (operatorAddress == '0xa2aad83466241232290bebcd43dcbff6a7f8d23a') {
+        // arb-rinkeby: test operator
         marginAccount.operatorFee += operatorFee
     }
     marginAccount.save()
