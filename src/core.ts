@@ -77,11 +77,13 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
 
 export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): void {
     let user = fetchUser(event.params.trader)
-    log.debug("transferFeeToOperator user {}", [event.params.trader.toHexString()])
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
     let operatorAddress = event.params.operator.toHexString()
-    log.debug("transferFeeToOperator operatorAddress {}", [operatorAddress])
+    log.debug("transferFeeToOperator user {}, operatorAddress {}, perpetualIndex {}, amount {}", [
+        event.params.trader.toHexString(), event.params.operator.toHexString(), event.params.perpetualIndex.toString(),
+        operatorFee.toString()
+    ])
     if (operatorAddress == '0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e') {
         // bsc: MCDEX dao operator
         marginAccount.operatorFee += operatorFee
@@ -96,6 +98,10 @@ export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let vaultFee = convertToDecimal(event.params.vaultFee, BI_18)
+    log.debug("transferFeeToVault user {}, vaultAddress {}, perpetualIndex {}, amount {}", [
+        event.params.trader.toHexString(), event.params.vault.toHexString(), event.params.perpetualIndex.toString(),
+        vaultFee.toString()
+    ])
     marginAccount.vaultFee += vaultFee
     marginAccount.save()
 }
