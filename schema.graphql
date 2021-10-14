@@ -19,5 +19,8 @@ type MarginAccount @entity {
     user: User!
     position: BigDecimal!
     totalFee: BigDecimal!
-    inversePoolTotalFee: BigDecimal!
+    lpFee: BigDecimal!
+    vaultFee: BigDecimal!
+    operatorFee: BigDecimal!
+    referralRebate: BigDecimal!
 }
