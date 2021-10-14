@@ -521,6 +521,18 @@
     "anonymous": false,
     "inputs": [
       {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "perpetualIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
         "indexed": true,
         "internalType": "address",
         "name": "operator",
@@ -536,7 +548,38 @@
     "name": "TransferFeeToOperator",
     "type": "event"
   },
-  { 
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "perpetualIndex",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "trader",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "int256",
+        "name": "vaultFee",
+        "type": "int256"
+      }
+    ],
+    "name": "TransferFeeToVault",
+    "type": "event"
+  },
+  {
     "anonymous": false,
     "inputs": [
       { 

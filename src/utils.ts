@@ -48,7 +48,10 @@ export function fetchMarginAccount(user: User, pool: Address, perpetualIndex: Bi
     marginAccount.user = user.id
     marginAccount.position = ZERO_BD
     marginAccount.totalFee = ZERO_BD
-    marginAccount.inversePoolTotalFee = ZERO_BD
+    marginAccount.lpFee = ZERO_BD
+    marginAccount.operatorFee = ZERO_BD
+    marginAccount.vaultFee = ZERO_BD
+    marginAccount.referralRebate = ZERO_BD
     marginAccount.save()
   }
   return marginAccount as MarginAccount

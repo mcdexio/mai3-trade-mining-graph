@@ -3,6 +3,9 @@ import {
     Trade as TradeEvent,
     UpdatePrice as UpdatePriceEvent,
     Liquidate as LiquidateEvent,
+    TransferFeeToReferrer as TransferFeeToReferrerEvent,
+    TransferFeeToOperator as TransferFeeToOperatorEvent,
+    TransferFeeToVault as TransferFeeToVaultEvent,
 } from '../generated/LiquidityPool/LiquidityPool'
 
 import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
@@ -21,16 +24,16 @@ import {
 export function handleTrade(event: TradeEvent): void {
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
-    let markPrice = fetchMarkPrice(event.address, event.params.perpetualIndex)
     // user account in each pool
     let fee = convertToDecimal(event.params.fee, BI_18)
+    let lpFee = convertToDecimal(event.params.lpFee, BI_18)
     let position = convertToDecimal(event.params.position, BI_18)
     log.debug("user {} PerpIndex {} position {}", [event.params.trader.toHexString(), event.params.perpetualIndex.toString(), position.toString()])
     log.debug("{} convert => position: {}", [event.params.position.toString(), position.toString()])
     marginAccount.position += position
 
     marginAccount.totalFee += fee
-    marginAccount.inversePoolTotalFee += (fee / markPrice.price)
+    marginAccount.lpFee += lpFee
 
     marginAccount.save()
     user.save()
@@ -62,4 +65,31 @@ export function handleUpdatePrice(event: UpdatePriceEvent): void {
     markPrice.price = convertToDecimal(event.params.markPrice, BI_18)
     markPrice.timestamp = event.params.markPriceUpdateTime.toI32()
     markPrice.save()
+}
+
+export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): void {
+    let user = fetchUser(event.params.trader)
+    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let referralRebate = convertToDecimal(event.params.referralRebate, BI_18)
+    marginAccount.referralRebate += referralRebate
+    marginAccount.save()
+}
+
+export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): void {
+    let user = fetchUser(event.params.trader)
+    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
+    let operatorAddress = event.params.operator.toHexString()
+    if (operatorAddress == '0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e') {
+        marginAccount.operatorFee += operatorFee
+    }
+    marginAccount.save()
+}
+
+export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
+    let user = fetchUser(event.params.trader)
+    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let vaultFee = convertToDecimal(event.params.vaultFee, BI_18)
+    marginAccount.vaultFee += vaultFee
+    marginAccount.save()
 }

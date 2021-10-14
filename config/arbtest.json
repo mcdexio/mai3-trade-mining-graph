@@ -1,7 +1,6 @@
 {
     "network": "arbitrum-rinkeby",
     "start_block": 808,
-    "liquidity_pool": "0xc32a2dfEe97E2bABc90a2b5e6aef41e789ef2E13",
     "stake_contract": "0x4040e6Ea70d612C5CA9F7ab9237E32167e7f2f4E",
     "stake_start_block": 808
 }

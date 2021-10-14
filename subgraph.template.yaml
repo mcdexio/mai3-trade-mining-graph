@@ -50,4 +50,10 @@ dataSources:
           handler: handleUpdatePrice
         - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
           handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
       file: ./src/core.ts
