@@ -77,6 +77,7 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
 
 export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): void {
     let user = fetchUser(event.params.trader)
+    log.debug("transferFeeToOperator user {}", [event.params.trader.toHexString()])
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
     let operatorAddress = event.params.operator.toHexString()
