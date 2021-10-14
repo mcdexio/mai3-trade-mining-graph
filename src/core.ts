@@ -80,7 +80,7 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
     let operatorAddress = event.params.operator.toHexString()
-    log.debug("user {} PerpIndex {} operatorAddress {}", [event.params.trader.toHexString(), event.params.perpetualIndex.toString(), operatorAddress])
+    log.debug("transferFeeToOperator operatorAddress {}", [operatorAddress])
     if (operatorAddress == '0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e') {
         // bsc: MCDEX dao operator
         marginAccount.operatorFee += operatorFee
