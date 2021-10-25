@@ -91,9 +91,10 @@ export function fetchPerpetualTradeBlock(pool: Address, perpetualIndex: BigInt, 
 }
 
 export function fetchTrade(account: MarginAccount, transactionHash: string, logIndex: string, perpBlock: PerpetualTradeBlock): Trade {
-  let trade = Trade.load(transactionHash.concat('-').concat(logIndex))
+  let id = transactionHash.concat('-').concat(logIndex)
+  let trade = Trade.load(id)
   if (trade === null) {
-    trade = new Trade(transactionHash)
+    trade = new Trade(id)
     trade.user = account.user.id
     trade.trader = account.id
     trade.perpBlock = perpBlock.id
