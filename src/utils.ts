@@ -1,14 +1,18 @@
 import { BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 
-import { MarkPrice, User, MarginAccount } from '../generated/schema'
+import { MarkPrice, User, MarginAccount, Trade, PerpetualTradeBlock } from '../generated/schema'
 
 export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
 export let ZERO_BI = BigInt.fromI32(0)
 export let ONE_BI = BigInt.fromI32(1)
 export let ZERO_BD = BigDecimal.fromString('0')
 export let ONE_BD = BigDecimal.fromString('1')
+export let ZERO_FIVE_BD = BigDecimal.fromString('0.5')
 export let BI_18 = BigInt.fromI32(18)
 export let BI_6 = BigInt.fromI32(6)
+
+export const START_TIME = BigInt.fromString('1635142647')
+export const END_TIME = BigInt.fromString('1636142647')
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
   let bd = BigDecimal.fromString('1')
@@ -69,4 +73,34 @@ export function fetchMarkPrice(pool: Address, perpetualIndex: BigInt): MarkPrice
     markPrice.save()
   }
   return markPrice as MarkPrice
+}
+
+export function fetchPerpetualTradeBlock(pool: Address, perpetualIndex: BigInt, blockNumber: BigInt): PerpetualTradeBlock {
+  let id = pool.toHexString()
+  .concat('-')
+  .concat(perpetualIndex.toString())
+  .concat('-')
+  .concat(blockNumber.toString())
+  let perpBlock = PerpetualTradeBlock.load(id)
+  if (perpBlock === null) {
+    perpBlock = new PerpetualTradeBlock(id)
+    perpBlock.save()
+  }
+  return perpBlock as PerpetualTradeBlock
+}
+
+export function fetchTrade(account: MarginAccount, transactionHash: string, perpBlock: PerpetualTradeBlock): Trade {
+  let trade = Trade.load(transactionHash)
+  if (trade === null) {
+    trade = new Trade(transactionHash)
+    trade.trader = account.id
+    trade.perpBlock = perpBlock.id
+    trade.fee = ZERO_BD
+    trade.lpFee = ZERO_BD
+    trade.operatorFee = ZERO_BD
+    trade.vaultFee = ZERO_BD
+    trade.referralRebate = ZERO_BD
+    trade.save()
+  }
+  return trade as Trade
 }
