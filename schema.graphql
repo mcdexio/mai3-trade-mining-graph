@@ -23,7 +23,6 @@ type MarginAccount @entity {
     vaultFee: BigDecimal!
     operatorFee: BigDecimal!
     referralRebate: BigDecimal!
-    trades: [Trade!] @derivedFrom(filed:"trader")
 }
 
 type Trade @entity {

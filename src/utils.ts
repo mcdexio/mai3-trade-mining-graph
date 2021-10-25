@@ -11,8 +11,8 @@ export let ZERO_FIVE_BD = BigDecimal.fromString('0.5')
 export let BI_18 = BigInt.fromI32(18)
 export let BI_6 = BigInt.fromI32(6)
 
-export const START_TIME = BigInt.fromString('1635142647')
-export const END_TIME = BigInt.fromString('1636142647')
+export let START_TIME = BigDecimal.fromString('1635142647')
+export let END_TIME = BigDecimal.fromString('1636142647')
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
   let bd = BigDecimal.fromString('1')
@@ -95,6 +95,8 @@ export function fetchTrade(account: MarginAccount, transactionHash: string, perp
     trade = new Trade(transactionHash)
     trade.trader = account.id
     trade.perpBlock = perpBlock.id
+    trade.amount = ZERO_BD
+    trade.price = ZERO_BD
     trade.fee = ZERO_BD
     trade.lpFee = ZERO_BD
     trade.operatorFee = ZERO_BD
