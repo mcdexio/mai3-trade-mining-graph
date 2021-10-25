@@ -11,9 +11,6 @@ export let ZERO_FIVE_BD = BigDecimal.fromString('0.5')
 export let BI_18 = BigInt.fromI32(18)
 export let BI_6 = BigInt.fromI32(6)
 
-export let START_TIME = BigDecimal.fromString('1635142647')
-export let END_TIME = BigDecimal.fromString('1636142647')
-
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
   let bd = BigDecimal.fromString('1')
   for (let i = ZERO_BI; i.lt(decimals as BigInt); i = i.plus(ONE_BI)) {
@@ -90,12 +87,12 @@ export function fetchPerpetualTradeBlock(pool: Address, perpetualIndex: BigInt, 
   return perpBlock as PerpetualTradeBlock
 }
 
-export function fetchTrade(account: MarginAccount, transactionHash: string, logIndex: string, perpBlock: PerpetualTradeBlock): Trade {
-  let id = transactionHash.concat('-').concat(logIndex)
+export function fetchTrade(account: MarginAccount, transactionHash: string, perpBlock: PerpetualTradeBlock): Trade {
+  let id = transactionHash.concat('-').concat(account.id)
   let trade = Trade.load(id)
   if (trade === null) {
     trade = new Trade(id)
-    trade.user = account.user.id
+    trade.user = account.user
     trade.trader = account.id
     trade.perpBlock = perpBlock.id
     trade.amount = ZERO_BD

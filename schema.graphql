@@ -26,7 +26,7 @@ type MarginAccount @entity {
 }
 
 type Trade @entity {
-    # transactionHash + "-" + logIndex
+    # transactionHash + "-" + account.id
     id: ID!
     perpBlock: PerpetualTradeBlock!
     user: String!
