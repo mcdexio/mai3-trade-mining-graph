@@ -45,5 +45,5 @@ type PerpetualTradeBlock @entity {
     # pool address + "-" + perpetual index + "-" + blockNumber
     id: ID!
     blockNumber: BigInt!
-    trades: [Trade!] @derivedFrom(field:"perpBlock")
+    trades: [String!]
 }
