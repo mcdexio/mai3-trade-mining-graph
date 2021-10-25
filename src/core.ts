@@ -43,11 +43,12 @@ export function handleTrade(event: TradeEvent): void {
     trade.amount = position
     trade.price = price
     let isWashTrading = false
-    for (let i=0; i < perpTradeBlock.trades.length; i++) {
-        let tradeInSameBlock = Trade.load(perpTradeBlock.trades[i]) as Trade
+    let trades = perpTradeBlock.trades as string[]
+    for (let i=0; i < trades.length; i++) {
+        let tradeInSameBlock = Trade.load(trades[i]) as Trade
         // find anti wash trade, decrease fee added before
         if (tradeInSameBlock.amount == position.neg()) {
-            let trader = trade.trader
+            let trader = MarginAccount.load(trade.trader)
             trader.totalFee -= tradeInSameBlock.fee
             trader.lpFee -= tradeInSameBlock.lpFee
             trader.operatorFee -= tradeInSameBlock.operatorFee
