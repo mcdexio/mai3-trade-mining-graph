@@ -25,14 +25,10 @@ import {
     ZERO_FIVE_BD,
 } from "./utils"
 
-export let START_TIME = BigDecimal.fromString('1633359620')
-export let END_TIME = BigDecimal.fromString('1633434897')
+let START_TIME = BigInt.fromI32(1634515200)
+let EPOCH_DURATION = BigInt.fromI32(14*24*60*60)
 
 export function handleTrade(event: TradeEvent): void {
-    let timestamp = event.block.timestamp.toBigDecimal()
-    if (timestamp > END_TIME) {
-        return
-    }
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     
@@ -45,26 +41,29 @@ export function handleTrade(event: TradeEvent): void {
     marginAccount.position += position
     
     let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
-    let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
-    trade.amount = position
-    trade.price = price
+    // check anti wash trading from epoch 2
     let isWashTrading = false
-    let trades = perpTradeBlock.trades as string[]
-    for (let i=0; i < trades.length; i++) {
-        let tradeInSameBlock = Trade.load(trades[i]) as Trade
-        // find anti wash trade, decrease fee added before
-        if (tradeInSameBlock.amount == position.neg()) {
-            let trader = MarginAccount.load(trade.trader)
-            trader.totalFee -= tradeInSameBlock.fee
-            trader.lpFee -= tradeInSameBlock.lpFee
-            trader.operatorFee -= tradeInSameBlock.operatorFee
-            trader.vaultFee -= tradeInSameBlock.vaultFee
-            trader.referralRebate -= tradeInSameBlock.referralRebate
-            trader.save()
-            isWashTrading = true
+    if (event.block.timestamp >= (START_TIME + EPOCH_DURATION)) {
+        let trades = perpTradeBlock.trades as string[]
+        for (let i=0; i < trades.length; i++) {
+            let tradeInSameBlock = Trade.load(trades[i]) as Trade
+            // find anti wash trading, decrease fee added before
+            if (tradeInSameBlock.amount == position.neg()) {
+                let trader = MarginAccount.load(tradeInSameBlock.trader)
+                trader.totalFee -= tradeInSameBlock.fee
+                trader.lpFee -= tradeInSameBlock.lpFee
+                trader.operatorFee -= tradeInSameBlock.operatorFee
+                trader.vaultFee -= tradeInSameBlock.vaultFee
+                trader.referralRebate -= tradeInSameBlock.referralRebate
+                trader.save()
+                isWashTrading = true
+            }
         }
     }
 
+    let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
+    trade.amount = position
+    trade.price = price
     if (isWashTrading) {
         trade.save()
         marginAccount.save()
@@ -73,7 +72,7 @@ export function handleTrade(event: TradeEvent): void {
     }
 
     // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
-    let factor = computeEffectiveFactor(timestamp)
+    let factor = computeEffectiveFactor(event.block.timestamp)
     trade.fee = factor * fee
     trade.lpFee = factor * lpFee
     trade.save()
@@ -85,18 +84,58 @@ export function handleTrade(event: TradeEvent): void {
     user.save()
 }
 
-export function computeEffectiveFactor(timestamp: BigDecimal): BigDecimal {
-    let totalEpochTime = END_TIME - START_TIME
-    let elapsedTime = timestamp - START_TIME
-    let timeWeight = elapsedTime / totalEpochTime
+export function computeEffectiveFactor(timestamp: BigInt): BigDecimal {
+    let startTime = START_TIME
+    let endTime = START_TIME
+
+    if (timestamp >= START_TIME && timestamp <= (START_TIME + EPOCH_DURATION)) {
+        // epoch 1
+        endTime = START_TIME + EPOCH_DURATION
+    } else if (timestamp >= (START_TIME + EPOCH_DURATION) && 
+        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)))
+    {
+        // epoch 2
+        startTime = START_TIME+EPOCH_DURATION
+        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(2)
+    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)) && 
+        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)))
+    {
+        // epoch 3
+        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(2)
+        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(3)
+    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)) && 
+        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)))
+    {
+        // epoch 4
+        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(3)
+        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(4)
+    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)) && 
+        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)))
+    {
+        // epoch 5
+        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(4)
+        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(5)
+    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)) && 
+        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(6)))
+    {
+        // epoch 6
+        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(5)
+        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(6)
+    } else {
+        return ONE_BD
+    }
+
+    if (startTime == endTime) {
+        return ONE_BD
+    }
+    // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
+    let totalEpochTime = startTime.toBigDecimal() - endTime.toBigDecimal()
+    let elapsedTime = timestamp - startTime
+    let timeWeight = elapsedTime.toBigDecimal() / totalEpochTime
     return ONE_BD - ZERO_FIVE_BD*timeWeight
 }
 
 export function handleLiquidate(event: LiquidateEvent): void {
-    let timestamp = event.block.timestamp.toBigDecimal()
-    if (timestamp > END_TIME) {
-        return
-    }
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let position = convertToDecimal(event.params.amount, BI_18)
@@ -125,18 +164,13 @@ export function handleUpdatePrice(event: UpdatePriceEvent): void {
 }
 
 export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): void {
-    let timestamp = event.block.timestamp.toBigDecimal()
-    if (timestamp > END_TIME) {
-        return
-    }
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let referralRebate = convertToDecimal(event.params.referralRebate, BI_18)
 
     let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
-    // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
-    let factor = computeEffectiveFactor(timestamp)
+    let factor = computeEffectiveFactor(event.block.timestamp)
     trade.referralRebate += referralRebate*factor
     trade.save()
     marginAccount.referralRebate += referralRebate*factor
@@ -144,15 +178,10 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
 }
 
 export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): void {
-    let timestamp = event.block.timestamp.toBigDecimal()
-    if (timestamp > END_TIME) {
-        return
-    }
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
-    // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
-    let factor = computeEffectiveFactor(timestamp)
+    let factor = computeEffectiveFactor(event.block.timestamp)
     let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
 
@@ -176,10 +205,6 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
 }
 
 export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
-    let timestamp = event.block.timestamp.toBigDecimal()
-    if (timestamp > END_TIME) {
-        return
-    }
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let vaultFee = convertToDecimal(event.params.vaultFee, BI_18)
@@ -187,8 +212,7 @@ export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
         event.params.trader.toHexString(), event.params.vault.toHexString(), event.params.perpetualIndex.toString(),
         vaultFee.toString()
     ])
-    // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
-    let factor = computeEffectiveFactor(timestamp)
+    let factor = computeEffectiveFactor(event.block.timestamp)
     let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     trade.vaultFee += vaultFee*factor
