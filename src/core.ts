@@ -42,7 +42,7 @@ export function handleTrade(event: TradeEvent): void {
     log.debug("{} convert => position: {}", [event.params.position.toString(), position.toString()])
     marginAccount.position += position
     
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block)
+    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     trade.amount = position
     trade.price = price
@@ -131,7 +131,7 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let referralRebate = convertToDecimal(event.params.referralRebate, BI_18)
 
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block)
+    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
     let factor = computeEffectiveFactor(timestamp)
@@ -151,7 +151,7 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
     let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
     // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
     let factor = computeEffectiveFactor(timestamp)
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block)
+    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
 
     let operatorAddress = event.params.operator.toHexString()
@@ -187,7 +187,7 @@ export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
     ])
     // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
     let factor = computeEffectiveFactor(timestamp)
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block)
+    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     trade.vaultFee += vaultFee*factor
     trade.save()
