@@ -29,6 +29,7 @@ type Trade @entity {
     # transactionHash
     id: ID!
     perpBlock: PerpetualTradeBlock!
+    user: String!
     trader: MarginAccount!
     amount: BigDecimal!
     price: BigDecimal!
@@ -37,10 +38,12 @@ type Trade @entity {
     vaultFee: BigDecimal!
     operatorFee: BigDecimal!
     referralRebate: BigDecimal!
+    blockNumber: BigInt!
 }
 
 type PerpetualTradeBlock @entity {
     # pool address + "-" + perpetual index + "-" + blockNumber
     id: ID!
+    blockNumber: BigInt!
     trades: [Trade!] @derivedFrom(field:"perpBlock")
 }
