@@ -82,6 +82,7 @@ export function fetchPerpetualTradeBlock(pool: Address, perpetualIndex: BigInt, 
   if (perpBlock === null) {
     perpBlock = new PerpetualTradeBlock(id)
     perpBlock.blockNumber = blockNumber
+    perpBlock.trades = []
     perpBlock.save()
   }
   return perpBlock as PerpetualTradeBlock
@@ -104,6 +105,11 @@ export function fetchTrade(account: MarginAccount, transactionHash: string, perp
     trade.referralRebate = ZERO_BD
     trade.blockNumber = perpBlock.blockNumber
     trade.save()
+
+    let trades = perpBlock.trades
+    trades.push(trade.id)
+    perpBlock.trades = trades
+    perpBlock.save()
   }
   return trade as Trade
 }
