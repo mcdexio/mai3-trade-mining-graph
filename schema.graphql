@@ -23,4 +23,25 @@ type MarginAccount @entity {
     vaultFee: BigDecimal!
     operatorFee: BigDecimal!
     referralRebate: BigDecimal!
+    trades: [Trade!] @derivedFrom(filed:"trader")
+}
+
+type Trade @entity {
+    # transactionHash
+    id: ID!
+    perpBlock: PerpetualTradeBlock!
+    trader: MarginAccount!
+    amount: BigDecimal!
+    price: BigDecimal!
+    fee: BigDecimal!
+    lpFee: BigDecimal!
+    vaultFee: BigDecimal!
+    operatorFee: BigDecimal!
+    referralRebate: BigDecimal!
+}
+
+type PerpetualTradeBlock @entity {
+    # pool address + "-" + perpetual index + "-" + blockNumber
+    id: ID!
+    trades: [Trade!] @derivedFrom(field:"perpBlock")
 }
