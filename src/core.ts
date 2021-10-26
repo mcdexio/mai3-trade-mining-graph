@@ -205,13 +205,12 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
         // bsc: MCDEX dao operator
         marginAccount.operatorFee += operatorFee * factor
         trade.operatorFee += operatorFee*factor
-        trade.save()
     } else if (operatorAddress == '0xa2aad83466241232290bebcd43dcbff6a7f8d23a') {
         // arb-rinkeby: test operator
         marginAccount.operatorFee += operatorFee * factor
         trade.operatorFee += operatorFee*factor
-        trade.save()
     }
+    trade.save()
     marginAccount.save()
 }
 
@@ -219,13 +218,15 @@ export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
     let user = fetchUser(event.params.trader)
     let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
     let vaultFee = convertToDecimal(event.params.vaultFee, BI_18)
+    let factor = computeEffectiveFactor(event.block.timestamp)
+    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
+    let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
+
     log.debug("transferFeeToVault user {}, vaultAddress {}, perpetualIndex {}, amount {}", [
         event.params.trader.toHexString(), event.params.vault.toHexString(), event.params.perpetualIndex.toString(),
         vaultFee.toString()
     ])
-    let factor = computeEffectiveFactor(event.block.timestamp)
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
-    let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
+
     trade.vaultFee += vaultFee*factor
     trade.save()
     marginAccount.vaultFee += vaultFee*factor
