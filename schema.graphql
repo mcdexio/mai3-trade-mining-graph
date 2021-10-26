@@ -40,6 +40,8 @@ type Trade @entity {
     referralRebate: BigDecimal!
     isWashTrading: Boolean!
     blockNumber: BigInt!
+    timestamp: Int!
+    effectiveFactor: BigDecimal!
 }
 
 type PerpetualTradeBlock @entity {

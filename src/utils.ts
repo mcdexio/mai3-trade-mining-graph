@@ -105,6 +105,8 @@ export function fetchTrade(account: MarginAccount, transactionHash: string, perp
     trade.referralRebate = ZERO_BD
     trade.isWashTrading = false
     trade.blockNumber = perpBlock.blockNumber
+    trade.timestamp = 0
+    trade.effectiveFactor = ZERO_BD
     trade.save()
 
     let trades = perpBlock.trades

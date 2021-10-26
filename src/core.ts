@@ -72,6 +72,7 @@ export function handleTrade(event: TradeEvent): void {
 
     trade.amount = position
     trade.price = price
+    trade.timestamp = event.block.timestamp.toI32()
     if (trade.isWashTrading) {
         trade.save()
         marginAccount.save()
@@ -83,6 +84,7 @@ export function handleTrade(event: TradeEvent): void {
     let factor = computeEffectiveFactor(event.block.timestamp)
     trade.fee = factor * fee
     trade.lpFee = factor * lpFee
+    trade.effectiveFactor = factor
     trade.save()
 
     marginAccount.totalFee += factor * fee
