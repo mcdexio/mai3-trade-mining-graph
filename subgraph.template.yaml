@@ -40,6 +40,9 @@ dataSources:
       entities:
         - User
         - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
       abis:
         - name: LiquidityPool
           file: ./abis/LiquidityPool.json
