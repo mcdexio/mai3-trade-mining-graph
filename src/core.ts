@@ -26,7 +26,7 @@ import {
     ZERO_BD,
 } from "./utils"
 
-let START_TIME = BigInt.fromI32(1634515200)
+let START_TIME = BigInt.fromI32(1634515200) // epoch 1 startTime
 let EPOCH_DURATION = BigInt.fromI32(14*24*60*60)
 
 export function handleTrade(event: TradeEvent): void {
@@ -136,7 +136,7 @@ export function computeEffectiveFactor(timestamp: BigInt): BigDecimal {
         return ONE_BD
     }
 
-    if (startTime == endTime) {
+    if (startTime >= endTime) {
         return ONE_BD
     }
     // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
