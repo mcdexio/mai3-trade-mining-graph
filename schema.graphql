@@ -38,6 +38,7 @@ type Trade @entity {
     vaultFee: BigDecimal!
     operatorFee: BigDecimal!
     referralRebate: BigDecimal!
+    isWashTrading: Boolean!
     blockNumber: BigInt!
 }
 

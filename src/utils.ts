@@ -103,6 +103,7 @@ export function fetchTrade(account: MarginAccount, transactionHash: string, perp
     trade.operatorFee = ZERO_BD
     trade.vaultFee = ZERO_BD
     trade.referralRebate = ZERO_BD
+    trade.isWashTrading = false
     trade.blockNumber = perpBlock.blockNumber
     trade.save()
 
