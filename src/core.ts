@@ -41,8 +41,8 @@ export function handleTrade(event: TradeEvent): void {
     marginAccount.position += position
     
     let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
+    let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     // check anti wash trading from epoch 2
-    let isWashTrading = false
     if (event.block.timestamp >= (START_TIME + EPOCH_DURATION)) {
         let trades = perpTradeBlock.trades as string[]
         for (let i=0; i < trades.length; i++) {
@@ -56,15 +56,16 @@ export function handleTrade(event: TradeEvent): void {
                 trader.vaultFee -= tradeInSameBlock.vaultFee
                 trader.referralRebate -= tradeInSameBlock.referralRebate
                 trader.save()
-                isWashTrading = true
+                tradeInSameBlock.isWashTrading = true
+                tradeInSameBlock.save()
+                trade.isWashTrading = true
             }
         }
     }
 
-    let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     trade.amount = position
     trade.price = price
-    if (isWashTrading) {
+    if (trade.isWashTrading) {
         trade.save()
         marginAccount.save()
         user.save()
