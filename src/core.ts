@@ -23,6 +23,7 @@ import {
     fetchPerpetualTradeBlock,
     ONE_BD,
     ZERO_FIVE_BD,
+    ZERO_BD,
 } from "./utils"
 
 let START_TIME = BigInt.fromI32(1634515200)
@@ -56,6 +57,12 @@ export function handleTrade(event: TradeEvent): void {
                 trader.vaultFee -= tradeInSameBlock.vaultFee
                 trader.referralRebate -= tradeInSameBlock.referralRebate
                 trader.save()
+
+                tradeInSameBlock.fee = ZERO_BD
+                tradeInSameBlock.lpFee = ZERO_BD
+                tradeInSameBlock.operatorFee = ZERO_BD
+                tradeInSameBlock.vaultFee = ZERO_BD
+                tradeInSameBlock.referralRebate = ZERO_BD
                 tradeInSameBlock.isWashTrading = true
                 tradeInSameBlock.save()
                 trade.isWashTrading = true
