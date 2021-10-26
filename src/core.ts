@@ -96,34 +96,35 @@ export function computeEffectiveFactor(timestamp: BigInt): BigDecimal {
     let startTime = START_TIME
     let endTime = START_TIME
 
-    if (timestamp >= START_TIME && timestamp <= (START_TIME + EPOCH_DURATION)) {
+    if (timestamp > START_TIME && timestamp <= (START_TIME + EPOCH_DURATION)) {
         // epoch 1
         endTime = START_TIME + EPOCH_DURATION
-    } else if (timestamp >= (START_TIME + EPOCH_DURATION) && 
+        return ONE_BD
+    } else if (timestamp > (START_TIME + EPOCH_DURATION) && 
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)))
     {
         // epoch 2
         startTime = START_TIME+EPOCH_DURATION
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(2)
-    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)) && 
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)))
     {
         // epoch 3
         startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(2)
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(3)
-    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)) && 
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)))
     {
         // epoch 4
         startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(3)
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(4)
-    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)) && 
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)))
     {
         // epoch 5
         startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(4)
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(5)
-    } else if (timestamp >= (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)) && 
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(6)))
     {
         // epoch 6
@@ -137,7 +138,7 @@ export function computeEffectiveFactor(timestamp: BigInt): BigDecimal {
         return ONE_BD
     }
     // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
-    let totalEpochTime = startTime.toBigDecimal() - endTime.toBigDecimal()
+    let totalEpochTime = endTime.toBigDecimal() - startTime.toBigDecimal()
     let elapsedTime = timestamp - startTime
     let timeWeight = elapsedTime.toBigDecimal() / totalEpochTime
     return ONE_BD - ZERO_FIVE_BD*timeWeight
