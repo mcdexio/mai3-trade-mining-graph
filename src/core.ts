@@ -44,7 +44,7 @@ export function handleTrade(event: TradeEvent): void {
     let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     // check anti wash trading from epoch 2
-    if (event.block.timestamp >= (START_TIME + EPOCH_DURATION)) {
+    if (event.block.timestamp > (START_TIME + EPOCH_DURATION)) {
         let trades = perpTradeBlock.trades as string[]
         for (let i=0; i < trades.length; i++) {
             let tradeInSameBlock = Trade.load(trades[i]) as Trade
