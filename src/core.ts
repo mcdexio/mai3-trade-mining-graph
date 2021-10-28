@@ -201,12 +201,10 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
         event.params.trader.toHexString(), event.params.operator.toHexString(), event.params.perpetualIndex.toString(),
         operatorFee.toString()
     ])
-    if (operatorAddress == '0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e') {
-        // bsc: MCDEX dao operator
-        marginAccount.operatorFee += operatorFee * factor
-        trade.operatorFee += operatorFee*factor
-    } else if (operatorAddress == '0xa2aad83466241232290bebcd43dcbff6a7f8d23a') {
-        // arb-rinkeby: test operator
+    if ((operatorAddress == '0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e') ||
+        (operatorAddress == '0xe9e60660459428e43aba1c334d1246747f2aa856')) {
+        // bsc: 0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e MCDEX dao operator
+        // arb: 0xe9e60660459428e43aba1c334d1246747f2aa856 MCDEX dao operator
         marginAccount.operatorFee += operatorFee * factor
         trade.operatorFee += operatorFee*factor
     }

@@ -1,14 +1,6 @@
 {
     "network": "arbitrum-one",
-    "mining_protocol_address": "0x005aB6cdf754125B39069eb6bf126030a9113474",
-    "start_block": 52927,
-    "mcb_address": "0x4e352cf164e64adcbad318c3a1e222e9eba4ce42",
-    "eth_address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-    "usdc_address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
-    "mcb_oracle": "0xe9727d80F0A0b8c7372a3e5820b6802FADb1E83B",
-    "eth_oracle": "0x1cf22b7f84f86c36cb191bb24993eda2b191399e",
-    "mcb_eth_pool_address": "0xDCC3AC7668d46f44434BF1ffe57A37e25cA3aCf3",
-    "eth_usdc_pool_address": "0x17c14D2c404D167802b16C450d3c99F88F2c4F4d",
-    "certified_usdc_pool": "0xab324146c49b23658e5b3930e641bdbdf089cbac",
-    "certified_usdc_pool_name": "USDC Pool"
+    "start_block": 219883,
+    "stake_contract": "0xB3500fb8fa94423974A5A6e55c405139c5928E85",
+    "stake_start_block": 2590452
 }
