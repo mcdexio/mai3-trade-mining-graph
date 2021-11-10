@@ -1,0 +1,266 @@
+specVersion: 0.0.2
+description: mai3-trade-mining-graph
+repository: https://github.com/mcdexio/mai3-trade-mining-graph
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: StakePool
+    network: bsc
+    source:
+      address: '0x78963E7cB9454cCf8412Cd0B5bC4C69AD5cDbBd3'
+      abi: StakePool
+      startBlock: 11382039
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+      abis:
+        - name: StakePool
+          file: ./abis/MCBStaking.json
+      eventHandlers:
+        - event: Redeem(indexed address,uint256)
+          handler: handleRedeem
+        - event: Stake(indexed address,uint256,uint256,uint256)
+          handler: handleStake
+      file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-BUSD
+    network: bsc
+    source:
+      address: '0xdb282BBaCE4E375fF2901b84Aceb33016d0d663D'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
+          handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
+      file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-BTCB
+    network: bsc
+    source:
+      address: '0x2ea001032b0EB424120B4dEC51Bf02DB0dF46c78'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
+          handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
+      file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-ETH
+    network: bsc
+    source:
+      address: '0xF6b2D76C248aF20009188139660A516e5c4e0532'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
+          handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
+      file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-USX
+    network: bsc
+    source:
+      address: '0x0a848c92295369794d38dfa1e4d26612cad2dfa8'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
+          handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
+      file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-USDO
+    network: bsc
+    source:
+      address: '0x23cDA00836e60d213d8e7b0c50c1e268E67b96f1'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
+          handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
+      file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-SATS
+    network: bsc
+    source:
+      address: '0xfdd10c021b43c4be1b9f0473bad686e546d98b00'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
+          handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
+      file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-MIM
+    network: bsc
+    source:
+      address: '0xd2Bb2Ff558ba807866DB36D9d1E8d31eE7076862'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - User
+        - MarkPrice
+        - MarginAccount
+        - Trade
+        - PerpetualTradeBlock
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: Trade(uint256,indexed address,int256,int256,int256,int256)
+          handler: handleTrade
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+        - event: Liquidate(uint256,indexed address,indexed address,int256,int256,int256,int256)
+          handler: handleLiquidate
+        - event: TransferFeeToReferrer(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToReferrer
+        - event: TransferFeeToOperator(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToOperator
+        - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
+          handler: handleTransferFeeToVault
+      file: ./src/core.ts
