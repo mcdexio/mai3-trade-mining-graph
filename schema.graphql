@@ -22,6 +22,10 @@ type MarginAccount @entity {
     lpFee: BigDecimal!
     vaultFee: BigDecimal!
     operatorFee: BigDecimal!
+    totalFeeFactor: BigDecimal!
+    lpFeeFactor: BigDecimal!
+    vaultFeeFactor: BigDecimal!
+    operatorFeeFactor: BigDecimal!
     referralRebate: BigDecimal!
 }
 

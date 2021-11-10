@@ -87,8 +87,10 @@ export function handleTrade(event: TradeEvent): void {
     trade.effectiveFactor = factor
     trade.save()
 
-    marginAccount.totalFee += factor * fee
-    marginAccount.lpFee += factor * lpFee
+    marginAccount.totalFee +=  fee
+    marginAccount.lpFee +=  lpFee
+    marginAccount.totalFeeFactor += factor * fee
+    marginAccount.lpFeeFactor += factor * lpFee
 
     marginAccount.save()
     user.save()
@@ -184,7 +186,8 @@ export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): 
     let factor = computeEffectiveFactor(event.block.timestamp)
     trade.referralRebate += referralRebate*factor
     trade.save()
-    marginAccount.referralRebate += referralRebate*factor
+    marginAccount.referralRebateFactor += referralRebate*factor
+    marginAccount.referralRebate += referralRebate
     marginAccount.save()
 }
 
@@ -205,7 +208,8 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
         (operatorAddress == '0xe9e60660459428e43aba1c334d1246747f2aa856')) {
         // bsc: 0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e MCDEX dao operator
         // arb: 0xe9e60660459428e43aba1c334d1246747f2aa856 MCDEX dao operator
-        marginAccount.operatorFee += operatorFee * factor
+        marginAccount.operatorFeeFactor += operatorFee * factor
+        marginAccount.operatorFee += operatorFee
         trade.operatorFee += operatorFee*factor
     }
     trade.save()
@@ -227,6 +231,7 @@ export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
 
     trade.vaultFee += vaultFee*factor
     trade.save()
-    marginAccount.vaultFee += vaultFee*factor
+    marginAccount.vaultFeeFactor += vaultFee*factor
+    marginAccount.vaultFee += vaultFee
     marginAccount.save()
 }
