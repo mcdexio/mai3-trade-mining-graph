@@ -1,4 +1,4 @@
-import { MarkPrice, User, MarginAccount, Trade} from "../generated/schema"
+import { MarginAccount, Trade} from "../generated/schema"
 import {
     Trade as TradeEvent,
     UpdatePrice as UpdatePriceEvent,

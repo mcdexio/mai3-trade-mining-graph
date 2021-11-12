@@ -264,3 +264,23 @@ dataSources:
         - event: TransferFeeToVault(uint256,indexed address,indexed address,int256)
           handler: handleTransferFeeToVault
       file: ./src/core.ts
+  - kind: ethereum/contract
+    name: LiquidityPool-SQUID
+    network: bsc
+    source:
+      address: '0xe5ee45c397b52f2f4a671a17fa4d6d3f27a3099a'
+      abi: LiquidityPool
+      startBlock: 11137711
+    mapping:
+      kind: ethereum/event
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - MarkPrice
+      abis:
+        - name: LiquidityPool
+          file: ./abis/LiquidityPool.json
+      eventHandlers:
+        - event: UpdatePrice(uint256,indexed address,int256,uint256,int256,uint256)
+          handler: handleUpdatePrice
+      file: ./src/core.ts
