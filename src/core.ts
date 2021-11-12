@@ -51,11 +51,11 @@ export function handleTrade(event: TradeEvent): void {
             // find anti wash trading, decrease fee added before
             if (tradeInSameBlock.amount == position.neg()) {
                 let trader = MarginAccount.load(tradeInSameBlock.trader)
-                trader.totalFee -= tradeInSameBlock.fee
-                trader.lpFee -= tradeInSameBlock.lpFee
-                trader.operatorFee -= tradeInSameBlock.operatorFee
-                trader.vaultFee -= tradeInSameBlock.vaultFee
-                trader.referralRebate -= tradeInSameBlock.referralRebate
+                trader.totalFeeFactor -= tradeInSameBlock.fee
+                trader.lpFeeFactor -= tradeInSameBlock.lpFee
+                trader.operatorFeeFactor -= tradeInSameBlock.operatorFee
+                trader.vaultFeeFactor -= tradeInSameBlock.vaultFee
+                trader.referralRebateFactor -= tradeInSameBlock.referralRebate
                 trader.save()
 
                 tradeInSameBlock.fee = ZERO_BD
