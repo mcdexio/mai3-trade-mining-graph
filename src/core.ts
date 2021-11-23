@@ -30,8 +30,9 @@ let START_TIME = BigInt.fromI32(1634515200) // epoch 1 startTime
 let EPOCH_DURATION = BigInt.fromI32(14*24*60*60)
 
 export function handleTrade(event: TradeEvent): void {
+    let eventAddr = event.address
     let user = fetchUser(event.params.trader)
-    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let marginAccount = fetchMarginAccount(user, eventAddr, event.params.perpetualIndex)
     
     let fee = convertToDecimal(event.params.fee, BI_18)
     let lpFee = convertToDecimal(event.params.lpFee, BI_18)
@@ -41,7 +42,7 @@ export function handleTrade(event: TradeEvent): void {
     log.debug("{} convert => position: {}", [event.params.position.toString(), position.toString()])
     marginAccount.position += position
     
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
+    let perpTradeBlock = fetchPerpetualTradeBlock(eventAddr, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     // check anti wash trading from epoch 2
     if (event.block.timestamp > (START_TIME + EPOCH_DURATION)) {
@@ -87,10 +88,61 @@ export function handleTrade(event: TradeEvent): void {
     trade.effectiveFactor = factor
     trade.save()
 
-    marginAccount.totalFee +=  fee
-    marginAccount.lpFee +=  lpFee
-    marginAccount.totalFeeFactor += factor * fee
-    marginAccount.lpFeeFactor += factor * lpFee
+    if (
+      (eventAddr.toHexString() == '0xdb282bbace4e375ff2901b84aceb33016d0d663d') ||
+      (eventAddr.toHexString() == '0x23cda00836e60d213d8e7b0c50c1e268e67b96f1') ||
+      (eventAddr.toHexString() == '0x0a848c92295369794d38dfa1e4d26612cad2dfa8') ||
+      (eventAddr.toHexString() == '0xd2bb2ff558ba807866db36d9d1e8d31ee7076862') ||
+      (eventAddr.toHexString() == '0xab324146c49b23658e5b3930e641bdbdf089cbac') ||
+      (eventAddr.toHexString() == '0xc32a2dfee97e2babc90a2b5e6aef41e789ef2e13')
+    ) {
+        // usd quote directly add fee
+        // bsc's BUSD: 0xdb282bbace4e375ff2901b84aceb33016d0d663d
+        // bsc's OpenDao: 0x23cda00836e60d213d8e7b0c50c1e268e67b96f1
+        // bsc's USX: 0x0a848c92295369794d38dfa1e4d26612cad2dfa8
+        // bsc's MIM: 0xd2bb2ff558ba807866db36d9d1e8d31ee7076862
+        // arb's USDC: 0xab324146c49b23658e5b3930e641bdbdf089cbac
+        // arb-rinkeby's USDC: 0xc32a2dfee97e2babc90a2b5e6aef41e789ef2e13
+        marginAccount.totalFee +=  fee
+        marginAccount.lpFee +=  lpFee
+        marginAccount.totalFeeFactor += factor * fee
+        marginAccount.lpFeeFactor += factor * lpFee
+    }
+
+    // inverse contract
+    if (eventAddr.toHexString() == '0x2ea001032b0eb424120b4dec51bf02db0df46c78') {
+        // bsc's BTCB: 0x2ea001032b0eb424120b4dec51bf02db0df46c78
+        let markPrice = fetchMarkPrice(Address.fromString("0xdb282bbace4e375ff2901b84aceb33016d0d663d"), BigInt.fromString("0"))
+        marginAccount.totalFee += fee * markPrice
+        marginAccount.lpFee += lpFee * markPrice
+        marginAccount.totalFeeFactor += factor * fee * markPrice
+        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+    }
+    if (eventAddr.toHexString() == '0xf6b2d76c248af20009188139660a516e5c4e0532') {
+        // bsc's ETH: 0xf6b2d76c248af20009188139660a516e5c4e0532
+        let markPrice = fetchMarkPrice(Address.fromString("0xdb282bbace4e375ff2901b84aceb33016d0d663d"), BigInt.fromString("1"))
+        marginAccount.totalFee += fee * markPrice
+        marginAccount.lpFee += lpFee * markPrice
+        marginAccount.totalFeeFactor += factor * fee * markPrice
+        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+    }
+    if (eventAddr.toHexString() == '0xfdd10c021b43c4be1b9f0473bad686e546d98b00') {
+        // bsc's SATS: 0xfdd10c021b43c4be1b9f0473bad686e546d98b00
+        let markPrice = fetchMarkPrice(Address.fromString("0xdb282bbace4e375ff2901b84aceb33016d0d663d"), BigInt.fromString("0"))
+        markPrice = markPrice * 0.00000001
+        marginAccount.totalFee += fee * markPrice
+        marginAccount.lpFee += lpFee * markPrice
+        marginAccount.totalFeeFactor += factor * fee * markPrice
+        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+    }
+    if (eventAddr.toHexString() == '0xc7b2ad78fded2bbc74b50dc1881ce0f81a7a0cca') {
+        // arb's ETH: 0xc7b2ad78fded2bbc74b50dc1881ce0f81a7a0cca
+        let markPrice = fetchMarkPrice(Address.fromString("0xab324146c49b23658e5b3930e641bdbdf089cbac"), BigInt.fromString("0"))
+        marginAccount.totalFee += fee * markPrice
+        marginAccount.lpFee += lpFee * markPrice
+        marginAccount.totalFeeFactor += factor * fee * markPrice
+        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+    }
 
     marginAccount.save()
     user.save()
