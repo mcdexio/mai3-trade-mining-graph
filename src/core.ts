@@ -81,71 +81,56 @@ export function handleTrade(event: TradeEvent): void {
         return
     }
 
+    let markPrice = getMarkPrice(eventAddr)
+
     // EffectiveTradingFee=(1−0.5∗(ElapsedTime/TotalEpochTime))∗TradingFee
     let factor = computeEffectiveFactor(event.block.timestamp)
-    trade.fee = factor * fee
-    trade.lpFee = factor * lpFee
+    trade.fee = factor * fee * markPrice
+    trade.lpFee = factor * lpFee * markPrice
     trade.effectiveFactor = factor
     trade.save()
 
-    if (
-      (eventAddr.toHexString() == '0xdb282bbace4e375ff2901b84aceb33016d0d663d') ||
-      (eventAddr.toHexString() == '0x23cda00836e60d213d8e7b0c50c1e268e67b96f1') ||
-      (eventAddr.toHexString() == '0x0a848c92295369794d38dfa1e4d26612cad2dfa8') ||
-      (eventAddr.toHexString() == '0xd2bb2ff558ba807866db36d9d1e8d31ee7076862') ||
-      (eventAddr.toHexString() == '0xab324146c49b23658e5b3930e641bdbdf089cbac') ||
-      (eventAddr.toHexString() == '0xc32a2dfee97e2babc90a2b5e6aef41e789ef2e13')
-    ) {
-        // usd quote directly add fee
-        // bsc's BUSD: 0xdb282bbace4e375ff2901b84aceb33016d0d663d
-        // bsc's OpenDao: 0x23cda00836e60d213d8e7b0c50c1e268e67b96f1
-        // bsc's USX: 0x0a848c92295369794d38dfa1e4d26612cad2dfa8
-        // bsc's MIM: 0xd2bb2ff558ba807866db36d9d1e8d31ee7076862
-        // arb's USDC: 0xab324146c49b23658e5b3930e641bdbdf089cbac
-        // arb-rinkeby's USDC: 0xc32a2dfee97e2babc90a2b5e6aef41e789ef2e13
-        marginAccount.totalFee +=  fee
-        marginAccount.lpFee +=  lpFee
-        marginAccount.totalFeeFactor += factor * fee
-        marginAccount.lpFeeFactor += factor * lpFee
-    }
+    marginAccount.totalFee +=  fee * markPrice
+    marginAccount.lpFee +=  lpFee * markPrice
+    marginAccount.totalFeeFactor += factor * fee * markPrice
+    marginAccount.lpFeeFactor += factor * lpFee * markPrice
 
+    marginAccount.save()
+    user.save()
+}
+
+export function getMarkPrice(eventAddr: Address): BigDecimal {
     // inverse contract
     if (eventAddr.toHexString() == '0x2ea001032b0eb424120b4dec51bf02db0df46c78') {
         // bsc's BTCB: 0x2ea001032b0eb424120b4dec51bf02db0df46c78
         let markPrice = fetchMarkPrice(Address.fromString("0xdb282bbace4e375ff2901b84aceb33016d0d663d"), BigInt.fromString("0"))
-        marginAccount.totalFee += fee * markPrice
-        marginAccount.lpFee += lpFee * markPrice
-        marginAccount.totalFeeFactor += factor * fee * markPrice
-        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+        return markPrice.price
     }
     if (eventAddr.toHexString() == '0xf6b2d76c248af20009188139660a516e5c4e0532') {
         // bsc's ETH: 0xf6b2d76c248af20009188139660a516e5c4e0532
         let markPrice = fetchMarkPrice(Address.fromString("0xdb282bbace4e375ff2901b84aceb33016d0d663d"), BigInt.fromString("1"))
-        marginAccount.totalFee += fee * markPrice
-        marginAccount.lpFee += lpFee * markPrice
-        marginAccount.totalFeeFactor += factor * fee * markPrice
-        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+        return markPrice.price
     }
     if (eventAddr.toHexString() == '0xfdd10c021b43c4be1b9f0473bad686e546d98b00') {
         // bsc's SATS: 0xfdd10c021b43c4be1b9f0473bad686e546d98b00
         let markPrice = fetchMarkPrice(Address.fromString("0xdb282bbace4e375ff2901b84aceb33016d0d663d"), BigInt.fromString("0"))
-        markPrice = markPrice * 0.00000001
-        marginAccount.totalFee += fee * markPrice
-        marginAccount.lpFee += lpFee * markPrice
-        marginAccount.totalFeeFactor += factor * fee * markPrice
-        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+        let powTen = BigDecimal.fromString("100000000")
+        return markPrice.price.div(powTen)
     }
     if (eventAddr.toHexString() == '0xc7b2ad78fded2bbc74b50dc1881ce0f81a7a0cca') {
         // arb's ETH: 0xc7b2ad78fded2bbc74b50dc1881ce0f81a7a0cca
         let markPrice = fetchMarkPrice(Address.fromString("0xab324146c49b23658e5b3930e641bdbdf089cbac"), BigInt.fromString("0"))
-        marginAccount.totalFee += fee * markPrice
-        marginAccount.lpFee += lpFee * markPrice
-        marginAccount.totalFeeFactor += factor * fee * markPrice
-        marginAccount.lpFeeFactor += factor * lpFee * markPrice
+        return markPrice.price
     }
 
-    marginAccount.save()
-    user.save()
+    // usd quote directly add fee
+    // bsc's BUSD: 0xdb282bbace4e375ff2901b84aceb33016d0d663d
+    // bsc's OpenDao: 0x23cda00836e60d213d8e7b0c50c1e268e67b96f1
+    // bsc's USX: 0x0a848c92295369794d38dfa1e4d26612cad2dfa8
+    // bsc's MIM: 0xd2bb2ff558ba807866db36d9d1e8d31ee7076862
+    // arb's USDC: 0xab324146c49b23658e5b3930e641bdbdf089cbac
+    // arb-rinkeby's USDC: 0xc32a2dfee97e2babc90a2b5e6aef41e789ef2e13
+    return BigDecimal.fromString("1")
 }
 
 export function computeEffectiveFactor(timestamp: BigInt): BigDecimal {
@@ -156,31 +141,31 @@ export function computeEffectiveFactor(timestamp: BigInt): BigDecimal {
         // epoch 1
         endTime = START_TIME + EPOCH_DURATION
         return ONE_BD
-    } else if (timestamp > (START_TIME + EPOCH_DURATION) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION) &&
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)))
     {
         // epoch 2
         startTime = START_TIME+EPOCH_DURATION
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(2)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)) &&
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)))
     {
         // epoch 3
         startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(2)
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(3)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)) &&
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)))
     {
         // epoch 4
         startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(3)
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(4)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)) &&
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)))
     {
         // epoch 5
         startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(4)
         endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(5)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)) && 
+    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)) &&
         timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(6)))
     {
         // epoch 6
@@ -230,25 +215,28 @@ export function handleUpdatePrice(event: UpdatePriceEvent): void {
 
 export function handleTransferFeeToReferrer(event: TransferFeeToReferrerEvent): void {
     let user = fetchUser(event.params.trader)
-    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let eventAddr = event.address
+    let marginAccount = fetchMarginAccount(user, eventAddr, event.params.perpetualIndex)
     let referralRebate = convertToDecimal(event.params.referralRebate, BI_18)
-
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
+    let perpTradeBlock = fetchPerpetualTradeBlock(eventAddr, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
     let factor = computeEffectiveFactor(event.block.timestamp)
-    trade.referralRebate += referralRebate*factor
+    let markPrice = getMarkPrice(eventAddr)
+    trade.referralRebate += referralRebate*factor*markPrice
     trade.save()
-    marginAccount.referralRebateFactor += referralRebate*factor
-    marginAccount.referralRebate += referralRebate
+    marginAccount.referralRebateFactor += referralRebate*factor*markPrice
+    marginAccount.referralRebate += referralRebate*markPrice
     marginAccount.save()
 }
 
 export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): void {
     let user = fetchUser(event.params.trader)
-    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let eventAddr = event.address
+    let marginAccount = fetchMarginAccount(user, eventAddr, event.params.perpetualIndex)
     let operatorFee = convertToDecimal(event.params.operatorFee, BI_18)
     let factor = computeEffectiveFactor(event.block.timestamp)
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
+    let markPrice = getMarkPrice(eventAddr)
+    let perpTradeBlock = fetchPerpetualTradeBlock(eventAddr, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
 
     let operatorAddress = event.params.operator.toHexString()
@@ -260,9 +248,9 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
         (operatorAddress == '0xe9e60660459428e43aba1c334d1246747f2aa856')) {
         // bsc: 0xcfa46e1b666fd91bf39028055d506c1e4ca5ad6e MCDEX dao operator
         // arb: 0xe9e60660459428e43aba1c334d1246747f2aa856 MCDEX dao operator
-        marginAccount.operatorFeeFactor += operatorFee * factor
-        marginAccount.operatorFee += operatorFee
-        trade.operatorFee += operatorFee*factor
+        marginAccount.operatorFeeFactor += operatorFee * factor * markPrice
+        marginAccount.operatorFee += operatorFee * markPrice
+        trade.operatorFee += operatorFee*factor * markPrice
     }
     trade.save()
     marginAccount.save()
@@ -270,10 +258,12 @@ export function handleTransferFeeToOperator(event: TransferFeeToOperatorEvent): 
 
 export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
     let user = fetchUser(event.params.trader)
-    let marginAccount = fetchMarginAccount(user, event.address, event.params.perpetualIndex)
+    let eventAddr = event.address
+    let marginAccount = fetchMarginAccount(user, eventAddr, event.params.perpetualIndex)
     let vaultFee = convertToDecimal(event.params.vaultFee, BI_18)
     let factor = computeEffectiveFactor(event.block.timestamp)
-    let perpTradeBlock = fetchPerpetualTradeBlock(event.address, event.params.perpetualIndex, event.block.number)
+    let markPrice = getMarkPrice(eventAddr)
+    let perpTradeBlock = fetchPerpetualTradeBlock(eventAddr, event.params.perpetualIndex, event.block.number)
     let trade = fetchTrade(marginAccount, event.transaction.hash.toHex(), perpTradeBlock)
 
     log.debug("transferFeeToVault user {}, vaultAddress {}, perpetualIndex {}, amount {}", [
@@ -281,9 +271,9 @@ export function handleTransferFeeToVault(event: TransferFeeToVaultEvent): void {
         vaultFee.toString()
     ])
 
-    trade.vaultFee += vaultFee*factor
+    trade.vaultFee += vaultFee*factor*markPrice
     trade.save()
-    marginAccount.vaultFeeFactor += vaultFee*factor
-    marginAccount.vaultFee += vaultFee
+    marginAccount.vaultFeeFactor += vaultFee*factor*markPrice
+    marginAccount.vaultFee += vaultFee*markPrice
     marginAccount.save()
 }
