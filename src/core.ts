@@ -6,7 +6,7 @@ import {
     TransferFeeToReferrer as TransferFeeToReferrerEvent,
     TransferFeeToOperator as TransferFeeToOperatorEvent,
     TransferFeeToVault as TransferFeeToVaultEvent,
-} from '../generated/LiquidityPool/LiquidityPool'
+} from '../generated/LiquidityPool-ETH/LiquidityPool'
 
 import { log, BigInt, BigDecimal, Address } from '@graphprotocol/graph-ts'
 
@@ -24,6 +24,7 @@ import {
     ONE_BD,
     ZERO_FIVE_BD,
     ZERO_BD,
+    ONE_BI,
 } from "./utils"
 
 let START_TIME = BigInt.fromI32(1634515200) // epoch 1 startTime
@@ -137,42 +138,24 @@ export function computeEffectiveFactor(timestamp: BigInt): BigDecimal {
     let startTime = START_TIME
     let endTime = START_TIME
 
-    if (timestamp > START_TIME && timestamp <= (START_TIME + EPOCH_DURATION)) {
+
+    if (timestamp < START_TIME) {
+        return ONE_BD
+    } else if (timestamp > START_TIME && timestamp <= (START_TIME + EPOCH_DURATION)) {
         // epoch 1
         endTime = START_TIME + EPOCH_DURATION
         return ONE_BD
-    } else if (timestamp > (START_TIME + EPOCH_DURATION) &&
-        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)))
-    {
-        // epoch 2
-        startTime = START_TIME+EPOCH_DURATION
-        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(2)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(2)) &&
-        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)))
-    {
-        // epoch 3
-        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(2)
-        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(3)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(3)) &&
-        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)))
-    {
-        // epoch 4
-        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(3)
-        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(4)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(4)) &&
-        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)))
-    {
-        // epoch 5
-        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(4)
-        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(5)
-    } else if (timestamp > (START_TIME + EPOCH_DURATION * BigInt.fromI32(5)) &&
-        timestamp <= (START_TIME + EPOCH_DURATION * BigInt.fromI32(6)))
-    {
-        // epoch 6
-        startTime = START_TIME+EPOCH_DURATION * BigInt.fromI32(5)
-        endTime = START_TIME + EPOCH_DURATION*BigInt.fromI32(6)
-    } else {
-        return ONE_BD
+    } 
+
+    // from epoch 2
+    let i = ONE_BI
+    while(true) {
+        startTime = START_TIME + EPOCH_DURATION * i 
+        endTime = START_TIME + EPOCH_DURATION * (i + ONE_BI)
+        if (timestamp > startTime && timestamp <= endTime) {
+            break
+        }
+        i = i + ONE_BI
     }
 
     if (startTime >= endTime) {
